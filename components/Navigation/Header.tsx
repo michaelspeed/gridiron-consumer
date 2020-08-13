@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react"
 import {CardSideBar} from "../Cart/CartSideBar";
+import CollectionSelect from "./CollectionSelect";
 
 interface Props {
     menu: string
@@ -10,7 +11,6 @@ const Header = ({menu}: Props) => {
     const [menuTree, setMenuTree] = useState<any[]>([])
 
     useEffect(() => {
-        console.log(JSON.parse(menu))
         setMenuTree(JSON.parse(menu))
     }, [menu])
 
@@ -90,14 +90,7 @@ const Header = ({menu}: Props) => {
                                     </div>
                                     <div className="header-action-wrap header-action-flex header-action-width">
                                         <div className="categories-dropdown">
-                                            <select className="nice-select nice-select-style-1">
-                                                <option>Categories</option>
-                                                <option>Azerbaijan</option>
-                                                <option>Bahamas</option>
-                                                <option>Bahrain</option>
-                                                <option>Bangladesh</option>
-                                                <option>Barbados</option>
-                                            </select>
+                                            <CollectionSelect/>
                                         </div>
                                         <div className="search-style-2 mr-20">
                                             <form>

@@ -3,3 +3,21 @@ query GetMenu {
         menu
     }
 }
+
+query getAllCollection {
+    getAllCollection {
+        id
+        name
+        description
+    }
+}
+
+query getHomePage {
+    getHomePage {
+        id
+        title
+        targetId
+        single
+        list
+    }
+}

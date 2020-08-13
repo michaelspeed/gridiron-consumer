@@ -1,7 +1,6 @@
 import withApollo from "next-with-apollo";
-import {ApolloClient, createHttpLink, InMemoryCache} from "@apollo/client";
+import {ApolloClient, ApolloProvider, createHttpLink, InMemoryCache} from "@apollo/client";
 import {setContext} from "@apollo/client/link/context";
-import {ApolloProvider} from "@apollo/react-common";
 import {GridIronConstants} from "./globalconstants";
 
 export default withApollo(

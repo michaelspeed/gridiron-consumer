@@ -2,6 +2,7 @@ import React, {ReactNode} from 'react'
 import Head from 'next/head'
 import Header from "./Navigation/Header";
 import Footer from "./Footer/Footer";
+import withApollo from "../utils/withApollo";
 
 type Props = {
     children?: ReactNode
@@ -24,4 +25,4 @@ const Layout = ({children, menu, title = 'AirEcommerce'}: Props) => {
     )
 }
 
-export default Layout
+export default withApollo(Layout)

@@ -1,4 +1,5 @@
 import React from "react"
+import withApollo from "../utils/withApollo";
 
 function MyApp({Component, pageProps}) {
     return (
@@ -8,4 +9,4 @@ function MyApp({Component, pageProps}) {
     )
 }
 
-export default MyApp
+export default withApollo(MyApp)

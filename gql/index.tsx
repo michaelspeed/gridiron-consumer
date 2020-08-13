@@ -11,6 +11,8 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
+  JSON: any;
   /** Cursor for paging through collections */
   ConnectionCursor: any;
 };
@@ -113,6 +115,32 @@ export enum BillingAgreementState {
   Approved = 'APPROVED',
   Pending = 'PENDING',
   Rejected = 'REJECTED'
+}
+
+export type Page = {
+  __typename?: 'Page';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  title: Scalars['String'];
+  targetId: Scalars['String'];
+  single?: Maybe<Scalars['JSON']>;
+  list?: Maybe<Array<Scalars['String']>>;
+  pageType: PageType;
+  pageCategory: PageCategory;
+};
+
+
+export enum PageType {
+  List = 'LIST',
+  Single = 'SINGLE'
+}
+
+export enum PageCategory {
+  Home = 'HOME',
+  Category = 'CATEGORY',
+  Singleprod = 'SINGLEPROD',
+  Prodvariant = 'PRODVARIANT'
 }
 
 export type Delivery = {
@@ -2252,18 +2280,6 @@ export type PageMinAggregate = {
   pageCategory?: Maybe<PageCategory>;
 };
 
-export enum PageType {
-  List = 'LIST',
-  Single = 'SINGLE'
-}
-
-export enum PageCategory {
-  Home = 'HOME',
-  Category = 'CATEGORY',
-  Singleprod = 'SINGLEPROD',
-  Prodvariant = 'PRODVARIANT'
-}
-
 export type PageMaxAggregate = {
   __typename?: 'PageMaxAggregate';
   id?: Maybe<Scalars['ID']>;
@@ -2456,6 +2472,8 @@ export type SettlementsMaxAggregate = {
 export type Query = {
   __typename?: 'Query';
   GetMenu: MenuResponseTypes;
+  getAllCollection: Array<Collection>;
+  getHomePage: Page;
 };
 
 export type GetMenuQueryVariables = Exact<{ [key: string]: never; }>;
@@ -2466,6 +2484,28 @@ export type GetMenuQuery = (
   & { GetMenu: (
     { __typename?: 'MenuResponseTypes' }
     & Pick<MenuResponseTypes, 'menu'>
+  ) }
+);
+
+export type GetAllCollectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllCollectionQuery = (
+  { __typename?: 'Query' }
+  & { getAllCollection: Array<(
+    { __typename?: 'Collection' }
+    & Pick<Collection, 'id' | 'name' | 'description'>
+  )> }
+);
+
+export type GetHomePageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetHomePageQuery = (
+  { __typename?: 'Query' }
+  & { getHomePage: (
+    { __typename?: 'Page' }
+    & Pick<Page, 'id' | 'title' | 'targetId' | 'single' | 'list'>
   ) }
 );
 
@@ -2502,3 +2542,73 @@ export function useGetMenuLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
 export type GetMenuQueryHookResult = ReturnType<typeof useGetMenuQuery>;
 export type GetMenuLazyQueryHookResult = ReturnType<typeof useGetMenuLazyQuery>;
 export type GetMenuQueryResult = Apollo.QueryResult<GetMenuQuery, GetMenuQueryVariables>;
+export const GetAllCollectionDocument = gql`
+    query getAllCollection {
+  getAllCollection {
+    id
+    name
+    description
+  }
+}
+    `;
+
+/**
+ * __useGetAllCollectionQuery__
+ *
+ * To run a query within a React component, call `useGetAllCollectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllCollectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllCollectionQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllCollectionQuery(baseOptions?: Apollo.QueryHookOptions<GetAllCollectionQuery, GetAllCollectionQueryVariables>) {
+        return Apollo.useQuery<GetAllCollectionQuery, GetAllCollectionQueryVariables>(GetAllCollectionDocument, baseOptions);
+      }
+export function useGetAllCollectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllCollectionQuery, GetAllCollectionQueryVariables>) {
+          return Apollo.useLazyQuery<GetAllCollectionQuery, GetAllCollectionQueryVariables>(GetAllCollectionDocument, baseOptions);
+        }
+export type GetAllCollectionQueryHookResult = ReturnType<typeof useGetAllCollectionQuery>;
+export type GetAllCollectionLazyQueryHookResult = ReturnType<typeof useGetAllCollectionLazyQuery>;
+export type GetAllCollectionQueryResult = Apollo.QueryResult<GetAllCollectionQuery, GetAllCollectionQueryVariables>;
+export const GetHomePageDocument = gql`
+    query getHomePage {
+  getHomePage {
+    id
+    title
+    targetId
+    single
+    list
+  }
+}
+    `;
+
+/**
+ * __useGetHomePageQuery__
+ *
+ * To run a query within a React component, call `useGetHomePageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetHomePageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetHomePageQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetHomePageQuery(baseOptions?: Apollo.QueryHookOptions<GetHomePageQuery, GetHomePageQueryVariables>) {
+        return Apollo.useQuery<GetHomePageQuery, GetHomePageQueryVariables>(GetHomePageDocument, baseOptions);
+      }
+export function useGetHomePageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetHomePageQuery, GetHomePageQueryVariables>) {
+          return Apollo.useLazyQuery<GetHomePageQuery, GetHomePageQueryVariables>(GetHomePageDocument, baseOptions);
+        }
+export type GetHomePageQueryHookResult = ReturnType<typeof useGetHomePageQuery>;
+export type GetHomePageLazyQueryHookResult = ReturnType<typeof useGetHomePageLazyQuery>;
+export type GetHomePageQueryResult = Apollo.QueryResult<GetHomePageQuery, GetHomePageQueryVariables>;
