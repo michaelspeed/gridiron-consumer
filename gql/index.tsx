@@ -11,6 +11,8 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
+  JSONObject: any;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
   /** Cursor for paging through collections */
@@ -35,6 +37,23 @@ export enum AdministratorEnum {
   Staff = 'STAFF'
 }
 
+export type Asset = {
+  __typename?: 'Asset';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+  mimeType: Scalars['String'];
+  width: Scalars['Float'];
+  height: Scalars['Float'];
+  fileSize: Scalars['Float'];
+  source: Scalars['String'];
+  preview: Scalars['String'];
+  focalPoint: Scalars['JSONObject'];
+};
+
+
 export type Collection = {
   __typename?: 'Collection';
   id: Scalars['ID'];
@@ -46,6 +65,45 @@ export type Collection = {
   isPrivate: Scalars['Boolean'];
   name: Scalars['String'];
   description: Scalars['String'];
+  children: Array<Collection>;
+  products: Array<Product>;
+  seo: Seo;
+};
+
+export type Facet = {
+  __typename?: 'Facet';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  isPrivate: Scalars['Boolean'];
+  code: Scalars['String'];
+};
+
+export type FacetValue = {
+  __typename?: 'FacetValue';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  code: Scalars['String'];
+  product: Array<Product>;
+  facet: Facet;
+};
+
+export type Product = {
+  __typename?: 'Product';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  productName: Scalars['String'];
+  slug: Scalars['String'];
+  description: Scalars['String'];
+  collection?: Maybe<Collection>;
+  options: Array<ProductOptionGroup>;
+  featuredAsset: Asset;
+  facets: Array<FacetValue>;
+  assets?: Maybe<Array<ProductAsset>>;
+  variants: Array<ProductVariant>;
 };
 
 export type User = {
@@ -79,6 +137,16 @@ export type Vendor = {
   email: Scalars['String'];
 };
 
+export type TaxRate = {
+  __typename?: 'TaxRate';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  value: Scalars['Float'];
+  enabled: Scalars['Boolean'];
+};
+
 export type Store = {
   __typename?: 'Store';
   id: Scalars['ID'];
@@ -101,6 +169,102 @@ export enum StoreTypeEnum {
   Default = 'DEFAULT',
   Vendor = 'VENDOR'
 }
+
+export type Seo = {
+  __typename?: 'Seo';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  deletedAt: Scalars['DateTime'];
+  urlKey: Scalars['String'];
+  metatitle: Scalars['String'];
+  metakeywords?: Maybe<Array<Scalars['String']>>;
+  metadesc: Scalars['String'];
+};
+
+export type ProductAsset = {
+  __typename?: 'ProductAsset';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  product: Product;
+  asset: Asset;
+};
+
+export type StockKeeping = {
+  __typename?: 'StockKeeping';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  quantity: Scalars['Float'];
+  available_quantity: Scalars['Float'];
+  threshold: Scalars['Float'];
+  multiple: Scalars['Boolean'];
+  backorder: Scalars['Boolean'];
+  stockstatus: Scalars['Boolean'];
+  sku: Scalars['String'];
+  type: Scalars['String'];
+  variant: ProductVariant;
+};
+
+export type ProductVariant = {
+  __typename?: 'ProductVariant';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  deletedAt: Scalars['DateTime'];
+  dum_price: Scalars['Float'];
+  enabled: Scalars['Boolean'];
+  sku: Scalars['String'];
+  name: Scalars['String'];
+  product: Product;
+  trackInventory: Scalars['Boolean'];
+  asset: ProductVariantAsset;
+  price?: Maybe<Array<ProductVariantPrice>>;
+  specs: ProductVariantSpecs;
+  seo?: Maybe<Seo>;
+  stock: Array<StockKeeping>;
+};
+
+export type ProductVariantAsset = {
+  __typename?: 'ProductVariantAsset';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  asset: Asset;
+  variant: ProductVariant;
+};
+
+export type ProductVariantPrice = {
+  __typename?: 'ProductVariantPrice';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  price: Scalars['Float'];
+  taxIncluded: Scalars['Boolean'];
+  tax: TaxRate;
+  variant: ProductVariant;
+  store: Store;
+};
+
+export type ProductOptionGroup = {
+  __typename?: 'ProductOptionGroup';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  code: Scalars['String'];
+};
+
+export type ProductVariantSpecs = {
+  __typename?: 'ProductVariantSpecs';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  specs: Scalars['JSON'];
+  variant: ProductVariant;
+};
+
 
 export type BillingAgreementRequest = {
   __typename?: 'BillingAgreementRequest';
@@ -129,7 +293,6 @@ export type Page = {
   pageType: PageType;
   pageCategory: PageCategory;
 };
-
 
 export enum PageType {
   List = 'LIST',
@@ -2474,6 +2637,12 @@ export type Query = {
   GetMenu: MenuResponseTypes;
   getAllCollection: Array<Collection>;
   getHomePage: Page;
+  getSingleProductVariant: ProductVariant;
+};
+
+
+export type QueryGetSingleProductVariantArgs = {
+  id: Scalars['ID'];
 };
 
 export type GetMenuQueryVariables = Exact<{ [key: string]: never; }>;
@@ -2506,6 +2675,55 @@ export type GetHomePageQuery = (
   & { getHomePage: (
     { __typename?: 'Page' }
     & Pick<Page, 'id' | 'title' | 'targetId' | 'single' | 'list'>
+  ) }
+);
+
+export type GetSingleProductVariantQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetSingleProductVariantQuery = (
+  { __typename?: 'Query' }
+  & { getSingleProductVariant: (
+    { __typename?: 'ProductVariant' }
+    & Pick<ProductVariant, 'id' | 'name'>
+    & { product: (
+      { __typename?: 'Product' }
+      & Pick<Product, 'id' | 'productName' | 'slug' | 'description'>
+      & { collection?: Maybe<(
+        { __typename?: 'Collection' }
+        & Pick<Collection, 'id' | 'name'>
+        & { seo: (
+          { __typename?: 'Seo' }
+          & Pick<Seo, 'urlKey' | 'metadesc' | 'metatitle' | 'metakeywords'>
+        ) }
+      )>, facets: Array<(
+        { __typename?: 'FacetValue' }
+        & Pick<FacetValue, 'id' | 'code'>
+        & { facet: (
+          { __typename?: 'Facet' }
+          & Pick<Facet, 'id' | 'name' | 'code'>
+        ) }
+      )>, assets?: Maybe<Array<(
+        { __typename?: 'ProductAsset' }
+        & Pick<ProductAsset, 'id'>
+        & { asset: (
+          { __typename?: 'Asset' }
+          & Pick<Asset, 'id' | 'preview' | 'source'>
+        ) }
+      )>> }
+    ), asset: (
+      { __typename?: 'ProductVariantAsset' }
+      & Pick<ProductVariantAsset, 'id'>
+      & { asset: (
+        { __typename?: 'Asset' }
+        & Pick<Asset, 'id' | 'preview' | 'source'>
+      ) }
+    ), seo?: Maybe<(
+      { __typename?: 'Seo' }
+      & Pick<Seo, 'id' | 'urlKey' | 'metatitle' | 'metadesc' | 'metakeywords'>
+    )> }
   ) }
 );
 
@@ -2612,3 +2830,85 @@ export function useGetHomePageLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetHomePageQueryHookResult = ReturnType<typeof useGetHomePageQuery>;
 export type GetHomePageLazyQueryHookResult = ReturnType<typeof useGetHomePageLazyQuery>;
 export type GetHomePageQueryResult = Apollo.QueryResult<GetHomePageQuery, GetHomePageQueryVariables>;
+export const GetSingleProductVariantDocument = gql`
+    query getSingleProductVariant($id: ID!) {
+  getSingleProductVariant(id: $id) {
+    id
+    name
+    product {
+      id
+      productName
+      slug
+      description
+      collection {
+        id
+        name
+        seo {
+          urlKey
+          metadesc
+          metatitle
+          metakeywords
+        }
+      }
+      facets {
+        id
+        code
+        facet {
+          id
+          name
+          code
+        }
+      }
+      assets {
+        id
+        asset {
+          id
+          preview
+          source
+        }
+      }
+    }
+    asset {
+      id
+      asset {
+        id
+        preview
+        source
+      }
+    }
+    seo {
+      id
+      urlKey
+      metatitle
+      metadesc
+      metakeywords
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSingleProductVariantQuery__
+ *
+ * To run a query within a React component, call `useGetSingleProductVariantQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSingleProductVariantQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSingleProductVariantQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetSingleProductVariantQuery(baseOptions?: Apollo.QueryHookOptions<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>) {
+        return Apollo.useQuery<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>(GetSingleProductVariantDocument, baseOptions);
+      }
+export function useGetSingleProductVariantLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>) {
+          return Apollo.useLazyQuery<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>(GetSingleProductVariantDocument, baseOptions);
+        }
+export type GetSingleProductVariantQueryHookResult = ReturnType<typeof useGetSingleProductVariantQuery>;
+export type GetSingleProductVariantLazyQueryHookResult = ReturnType<typeof useGetSingleProductVariantLazyQuery>;
+export type GetSingleProductVariantQueryResult = Apollo.QueryResult<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>;

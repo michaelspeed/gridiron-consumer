@@ -16,12 +16,18 @@ const IndexPage = ({menu, main}: Props) => {
   console.log(main)
   const navig = useRouter()
 
+  const onClickCarousel = (item) => {
+    if (item.type === 'variant') {
+      navig.push(`/product/${item.target.id}`)
+    }
+  }
+
   return (
       <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu}>
         <div className="slider-area bg-light-green slider-mt-1">
           <div className="slider-active-1 nav-style-1 dot-style-1">
             {main.map(item => (
-                <div className="single-slider slider-height-2 custom-d-flex custom-align-item-center">
+                <div className="single-slider slider-height-2 custom-d-flex custom-align-item-center" onClick={() => onClickCarousel(item)}>
                   <div className="container">
                     <div className="row align-items-center">
                       <div className="col-lg-6 col-md-6 col-12 col-sm-5">

@@ -21,3 +21,58 @@ query getHomePage {
         list
     }
 }
+
+query getSingleProductVariant($id: ID!){
+    getSingleProductVariant(id: $id){
+        id
+        name
+        product {
+            id
+            productName
+            slug
+            description
+            collection{
+                id
+                name
+                seo {
+                    urlKey
+                    metadesc
+                    metatitle
+                    metakeywords
+                }
+            }
+            facets {
+                id
+                code
+                facet {
+                    id
+                    name
+                    code
+                }
+            }
+            assets {
+                id
+                asset{
+                    id
+                    preview
+                    source
+                }
+            }
+        }
+        asset {
+            id
+            asset{
+                id
+                preview
+                source
+            }
+        }
+        seo {
+            id
+            urlKey
+            metatitle
+            metadesc
+            metakeywords
+        }
+    }
+}
