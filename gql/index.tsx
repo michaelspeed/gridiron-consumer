@@ -247,6 +247,15 @@ export type ProductVariantPrice = {
   store: Store;
 };
 
+export type ProductOption = {
+  __typename?: 'ProductOption';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  code: Scalars['String'];
+};
+
 export type ProductOptionGroup = {
   __typename?: 'ProductOptionGroup';
   id: Scalars['ID'];
@@ -254,6 +263,8 @@ export type ProductOptionGroup = {
   updatedAt: Scalars['DateTime'];
   name: Scalars['String'];
   code: Scalars['String'];
+  product: Product;
+  options: Array<ProductOption>;
 };
 
 export type ProductVariantSpecs = {
@@ -2691,7 +2702,17 @@ export type GetSingleProductVariantQuery = (
     & { product: (
       { __typename?: 'Product' }
       & Pick<Product, 'id' | 'productName' | 'slug' | 'description'>
-      & { collection?: Maybe<(
+      & { options: Array<(
+        { __typename?: 'ProductOptionGroup' }
+        & Pick<ProductOptionGroup, 'id' | 'name' | 'code'>
+        & { options: Array<(
+          { __typename?: 'ProductOption' }
+          & Pick<ProductOption, 'id' | 'name' | 'code'>
+        )> }
+      )>, variants: Array<(
+        { __typename?: 'ProductVariant' }
+        & Pick<ProductVariant, 'id' | 'name'>
+      )>, collection?: Maybe<(
         { __typename?: 'Collection' }
         & Pick<Collection, 'id' | 'name'>
         & { seo: (
@@ -2720,7 +2741,14 @@ export type GetSingleProductVariantQuery = (
         { __typename?: 'Asset' }
         & Pick<Asset, 'id' | 'preview' | 'source'>
       ) }
-    ), seo?: Maybe<(
+    ), price?: Maybe<Array<(
+      { __typename?: 'ProductVariantPrice' }
+      & Pick<ProductVariantPrice, 'id' | 'price'>
+      & { store: (
+        { __typename?: 'Store' }
+        & Pick<Store, 'id' | 'storeName'>
+      ) }
+    )>>, seo?: Maybe<(
       { __typename?: 'Seo' }
       & Pick<Seo, 'id' | 'urlKey' | 'metatitle' | 'metadesc' | 'metakeywords'>
     )> }
@@ -2839,7 +2867,21 @@ export const GetSingleProductVariantDocument = gql`
       id
       productName
       slug
+      options {
+        id
+        name
+        code
+        options {
+          id
+          name
+          code
+        }
+      }
       description
+      variants {
+        id
+        name
+      }
       collection {
         id
         name
@@ -2874,6 +2916,14 @@ export const GetSingleProductVariantDocument = gql`
         id
         preview
         source
+      }
+    }
+    price {
+      id
+      price
+      store {
+        id
+        storeName
       }
     }
     seo {

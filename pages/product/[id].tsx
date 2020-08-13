@@ -86,38 +86,18 @@ const SingleProduct = ({menu, variant}: Props) => {
                                     <span>US $75.72</span>
                                     <span className="old-price">US $95.72</span>
                                 </div>
-                                <div className="pro-details-color-wrap">
-                                    <span>Color:</span>
-                                    <div className="pro-details-color-content">
-                                        <ul>
-                                            <li><a className="white" href="#">Black</a></li>
-                                            <li><a className="azalea" href="#">Blue</a></li>
-                                            <li><a className="dolly" href="#">Green</a></li>
-                                            <li><a className="peach-orange" href="#">Orange</a></li>
-                                            <li><a className="mona-lisa active" href="#">Pink</a></li>
-                                            <li><a className="cupid" href="#">gray</a></li>
-                                        </ul>
+                                {variant.product.options.map(item => (
+                                    <div className="pro-details-size">
+                                        <span>{item.name}:</span>
+                                        <div className="pro-details-size-content">
+                                            <ul>
+                                                {item.options.map(opt => (
+                                                    <li><a href="#" style={{width: "inherit", paddingLeft: 5, paddingRight: 5}}>{opt.name}</a></li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="pro-details-size">
-                                    <span>Size:</span>
-                                    <div className="pro-details-size-content">
-                                        <ul>
-                                            <li><a href="#">XS</a></li>
-                                            <li><a href="#">S</a></li>
-                                            <li><a href="#">M</a></li>
-                                            <li><a href="#">L</a></li>
-                                            <li><a href="#">XL</a></li>
-                                            <li><a href="#">XXL</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="pro-details-quality">
-                                    <span>Quantity:</span>
-                                    <div className="cart-plus-minus">
-                                        <input className="cart-plus-minus-box" type="text" name="qtybutton" value="1"/>
-                                    </div>
-                                </div>
+                                ))}
                                 <div className="product-details-meta">
                                     <ul>
                                         {variant.product.facets.map(item => (

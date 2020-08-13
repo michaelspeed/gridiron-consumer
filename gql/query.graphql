@@ -30,7 +30,21 @@ query getSingleProductVariant($id: ID!){
             id
             productName
             slug
+            options {
+                id
+                name
+                code
+                options {
+                    id
+                    name
+                    code
+                }
+            }
             description
+            variants{
+                id
+                name
+            }
             collection{
                 id
                 name
@@ -65,6 +79,14 @@ query getSingleProductVariant($id: ID!){
                 id
                 preview
                 source
+            }
+        }
+        price{
+            id
+            price
+            store {
+                id
+                storeName
             }
         }
         seo {
