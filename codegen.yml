@@ -1,0 +1,9 @@
+overwrite: true
+schema: "http://localhost:5588/shop-api"
+documents: "gql/*.graphql"
+generates:
+  gql/index.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"

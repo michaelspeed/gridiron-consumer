@@ -11,12 +11,14 @@
     "moduleResolution": "node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "esnext"
+    "target": "esnext",
+    "noImplicitAny": false,
+    "allowUnusedLabels": false,
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx"]
