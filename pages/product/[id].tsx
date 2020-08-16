@@ -1,17 +1,27 @@
 import Layout from "../../components/Layout";
-import {Asset, GetHomePageDocument, GetMenuDocument, GetSingleProductVariantDocument, ProductVariant} from "../../gql";
+import {
+    Asset,
+    GetDefaultStoreDocument,
+    GetHomePageDocument,
+    GetMenuDocument,
+    GetSingleProductVariantDocument,
+    ProductVariant, Store
+} from "../../gql";
 import withApollo from "../../utils/withApollo";
 import useScripts from "../../utils/useScript";
 import {useEffect, useState} from "react";
 import {assetsURL} from "../../utils/globalconstants";
 import clsx from "clsx";
+import {initializeStore} from "../../store/store";
+import {getSnapshot} from "mobx-state-tree";
 
 interface Props {
     menu: any,
-    variant: ProductVariant
+    variant: ProductVariant,
+    store: Store
 }
 
-const SingleProduct = ({menu, variant}: Props) => {
+const SingleProduct = ({menu, variant, store}: Props) => {
 
     const [allAssets, setAllAllAssets] = useState<Asset[]>([])
 
@@ -31,8 +41,22 @@ const SingleProduct = ({menu, variant}: Props) => {
     console.log(variant)
     useScripts('/js/main.js')
 
+    const optColor = (name) => {
+        if (variant.name.indexOf(name) === -1) {
+            return {
+                back: '#FFFFFF',
+                color: '#000000'
+            }
+        } else {
+            return {
+                back: '#000000',
+                color: '#FFFFFF'
+            }
+        }
+    }
+
     return (
-        <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu}>
+        <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
             <div className="product-details-area product-details-bg slider-mt-7" style={{marginTop: 120}}>
                 <div className="container">
                     <div className="row">
@@ -92,7 +116,9 @@ const SingleProduct = ({menu, variant}: Props) => {
                                         <div className="pro-details-size-content">
                                             <ul>
                                                 {item.options.map(opt => (
-                                                    <li><a href="#" style={{width: "inherit", paddingLeft: 5, paddingRight: 5}}>{opt.name}</a></li>
+                                                    <li style={{backgroundColor: optColor(opt.code).back}}>
+                                                        <a href="#" style={{width: "inherit", paddingLeft: 5, paddingRight: 5, color: optColor(opt.code).color}}>{opt.name}</a>
+                                                    </li>
                                                 ))}
                                             </ul>
                                         </div>
@@ -474,9 +500,17 @@ SingleProduct.getInitialProps = async (ctx) => {
             id
         }
     })
+    const defaultStore = await client.query({
+        query: GetDefaultStoreDocument
+    })
+
+    const store = initializeStore()
+
     return {
         menu,
-        variant: variant.data.getSingleProductVariant
+        variant: variant.data.getSingleProductVariant,
+        store: defaultStore.data.GetDefaultStore,
+        initialStore: getSnapshot(store)
     }
 }
 

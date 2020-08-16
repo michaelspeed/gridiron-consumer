@@ -202,7 +202,7 @@
         padding: 80px 30px 76px 50px;
         position: relative;
         &::before {
-            background-image: url(../../assets/images/icon-img/service-shape.png);
+            /*background-image: url(../../assets/images/icon-img/service-shape.png);*/
             position: absolute;
             content: "";
             left: 0;
@@ -215,7 +215,7 @@
             z-index: 9;
         }
         &::after {
-            background-image: url(../../assets/images/icon-img/service-shape-2.png);
+            /*background-image: url(../../assets/images/icon-img/service-shape-2.png);*/
             position: absolute;
             content: "";
             left: 0;

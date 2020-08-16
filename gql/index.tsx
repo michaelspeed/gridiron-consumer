@@ -68,6 +68,7 @@ export type Collection = {
   children: Array<Collection>;
   products: Array<Product>;
   seo: Seo;
+  agreements: Array<BillingAgreement>;
 };
 
 export type Facet = {
@@ -112,19 +113,21 @@ export type User = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   email: Scalars['String'];
-  password: Scalars['String'];
   verified: Scalars['Boolean'];
   verificationToken?: Maybe<Scalars['String']>;
   passwordResetToken?: Maybe<Scalars['String']>;
   identifierChangeToken?: Maybe<Scalars['String']>;
   pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['String']>;
+  lastLogin?: Maybe<Scalars['DateTime']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber: Scalars['String'];
   administrator: Administrator;
   vendor: Vendor;
   delivery: Delivery;
+  cart: Cart;
+  view: Array<View>;
+  address: Array<Address>;
 };
 
 export type Vendor = {
@@ -267,6 +270,31 @@ export type ProductOptionGroup = {
   options: Array<ProductOption>;
 };
 
+export type BillingAgreement = {
+  __typename?: 'BillingAgreement';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  value: Scalars['Float'];
+  type: BillingAgreementEnum;
+  state: BillingAgreementState;
+  collection?: Maybe<Collection>;
+  store: Store;
+  request: Array<BillingAgreementRequest>;
+};
+
+export enum BillingAgreementEnum {
+  Planbase = 'PLANBASE',
+  Collectionbase = 'COLLECTIONBASE',
+  Comissionbase = 'COMISSIONBASE'
+}
+
+export enum BillingAgreementState {
+  Approved = 'APPROVED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED'
+}
+
 export type ProductVariantSpecs = {
   __typename?: 'ProductVariantSpecs';
   id: Scalars['ID'];
@@ -277,6 +305,16 @@ export type ProductVariantSpecs = {
 };
 
 
+export type Cart = {
+  __typename?: 'Cart';
+  id: Scalars['ID'];
+};
+
+export type View = {
+  __typename?: 'View';
+  id: Scalars['ID'];
+};
+
 export type BillingAgreementRequest = {
   __typename?: 'BillingAgreementRequest';
   id: Scalars['ID'];
@@ -285,12 +323,6 @@ export type BillingAgreementRequest = {
   value: Scalars['Float'];
   state: BillingAgreementState;
 };
-
-export enum BillingAgreementState {
-  Approved = 'APPROVED',
-  Pending = 'PENDING',
-  Rejected = 'REJECTED'
-}
 
 export type Page = {
   __typename?: 'Page';
@@ -324,6 +356,39 @@ export type Delivery = {
   updatedAt: Scalars['DateTime'];
   user: User;
 };
+
+export type Search = {
+  __typename?: 'Search';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  search: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+export type Address = {
+  __typename?: 'Address';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  fullName: Scalars['String'];
+  addressLine: Scalars['String'];
+  city: Scalars['String'];
+  state: Scalars['String'];
+  landmark: Scalars['String'];
+  postalCode: Scalars['String'];
+  phoneNumber: Scalars['String'];
+  alternatePhoneNumber: Scalars['String'];
+  defaultShippingAddress: Scalars['Boolean'];
+  defaultBillingAddress: Scalars['Boolean'];
+  addressType: AddressType;
+  user: User;
+};
+
+export enum AddressType {
+  Home = 'HOME',
+  Work = 'WORK'
+}
 
 export type AssetCountAggregate = {
   __typename?: 'AssetCountAggregate';
@@ -1017,7 +1082,7 @@ export type UserMinAggregate = {
   passwordResetToken?: Maybe<Scalars['String']>;
   identifierChangeToken?: Maybe<Scalars['String']>;
   pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['String']>;
+  lastLogin?: Maybe<Scalars['DateTime']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber?: Maybe<Scalars['String']>;
@@ -1033,7 +1098,7 @@ export type UserMaxAggregate = {
   passwordResetToken?: Maybe<Scalars['String']>;
   identifierChangeToken?: Maybe<Scalars['String']>;
   pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['String']>;
+  lastLogin?: Maybe<Scalars['DateTime']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber?: Maybe<Scalars['String']>;
@@ -2499,11 +2564,6 @@ export type AddressMinAggregate = {
   addressType?: Maybe<AddressType>;
 };
 
-export enum AddressType {
-  Home = 'HOME',
-  Work = 'WORK'
-}
-
 export type AddressMaxAggregate = {
   __typename?: 'AddressMaxAggregate';
   id?: Maybe<Scalars['ID']>;
@@ -2568,7 +2628,7 @@ export type AddressUsersMinAggregate = {
   passwordResetToken?: Maybe<Scalars['String']>;
   identifierChangeToken?: Maybe<Scalars['String']>;
   pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['String']>;
+  lastLogin?: Maybe<Scalars['DateTime']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber?: Maybe<Scalars['String']>;
@@ -2584,7 +2644,7 @@ export type AddressUsersMaxAggregate = {
   passwordResetToken?: Maybe<Scalars['String']>;
   identifierChangeToken?: Maybe<Scalars['String']>;
   pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['String']>;
+  lastLogin?: Maybe<Scalars['DateTime']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber?: Maybe<Scalars['String']>;
@@ -2643,18 +2703,177 @@ export type SettlementsMaxAggregate = {
   type?: Maybe<SettlementType>;
 };
 
+export type CollectionSingleResponse = {
+  __typename?: 'CollectionSingleResponse';
+  collection: Collection;
+  facetValues: Array<FacetValue>;
+};
+
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  user: User;
+  token: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   GetMenu: MenuResponseTypes;
   getAllCollection: Array<Collection>;
+  GetCollectionTree: Array<Collection>;
+  GetSingleCollection: CollectionSingleResponse;
+  GetFacetsByCollection: Array<FacetValue>;
+  GetProductVariantForCollection: Array<ProductVariant>;
   getHomePage: Page;
   getSingleProductVariant: ProductVariant;
+  getProductAsset: Asset;
+  GetDefaultStore: Store;
+  GetCurrentUser: User;
+  GetUserAddress: Array<Address>;
+  GetAllSearch: Array<Search>;
+};
+
+
+export type QueryGetSingleCollectionArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetFacetsByCollectionArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetProductVariantForCollectionArgs = {
+  search?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+  id: Scalars['ID'];
 };
 
 
 export type QueryGetSingleProductVariantArgs = {
   id: Scalars['ID'];
 };
+
+
+export type QueryGetProductAssetArgs = {
+  prodId?: Maybe<Scalars['ID']>;
+  variantId?: Maybe<Scalars['ID']>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  CreateUser: UserResponse;
+  LoginUser: UserResponse;
+  UpdateAccountInfo: User;
+  CreateNewAddress: Address;
+  UpdateNewAddress: Address;
+  RegisterSearch: Search;
+};
+
+
+export type MutationCreateUserArgs = {
+  lname: Scalars['String'];
+  fname: Scalars['String'];
+  phone: Scalars['String'];
+  password: Scalars['String'];
+  email: Scalars['String'];
+};
+
+
+export type MutationLoginUserArgs = {
+  password: Scalars['String'];
+  email: Scalars['String'];
+};
+
+
+export type MutationUpdateAccountInfoArgs = {
+  lname: Scalars['String'];
+  fname: Scalars['String'];
+  phone: Scalars['String'];
+};
+
+
+export type MutationCreateNewAddressArgs = {
+  type: AddressType;
+  phoneNumber: Scalars['String'];
+  postalCode: Scalars['String'];
+  landmark: Scalars['String'];
+  state: Scalars['String'];
+  city: Scalars['String'];
+  addressLine: Scalars['String'];
+  fullName: Scalars['String'];
+};
+
+
+export type MutationUpdateNewAddressArgs = {
+  id: Scalars['ID'];
+  type: AddressType;
+  phoneNumber: Scalars['String'];
+  postalCode: Scalars['String'];
+  landmark: Scalars['String'];
+  state: Scalars['String'];
+  city: Scalars['String'];
+  addressLine: Scalars['String'];
+  fullName: Scalars['String'];
+};
+
+
+export type MutationRegisterSearchArgs = {
+  search: Scalars['String'];
+};
+
+export type LoginUserMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginUserMutation = (
+  { __typename?: 'Mutation' }
+  & { LoginUser: (
+    { __typename?: 'UserResponse' }
+    & Pick<UserResponse, 'token'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'email' | 'phoneNumber'>
+    ) }
+  ) }
+);
+
+export type UpdateAccountInfoMutationVariables = Exact<{
+  lname: Scalars['String'];
+  fname: Scalars['String'];
+  phone: Scalars['String'];
+}>;
+
+
+export type UpdateAccountInfoMutation = (
+  { __typename?: 'Mutation' }
+  & { UpdateAccountInfo: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'email'>
+  ) }
+);
+
+export type CreateNewAddressMutationVariables = Exact<{
+  fullName: Scalars['String'];
+  addressLine: Scalars['String'];
+  city: Scalars['String'];
+  state: Scalars['String'];
+  landmark: Scalars['String'];
+  postalCode: Scalars['String'];
+  phoneNumber: Scalars['String'];
+  type: AddressType;
+}>;
+
+
+export type CreateNewAddressMutation = (
+  { __typename?: 'Mutation' }
+  & { CreateNewAddress: (
+    { __typename?: 'Address' }
+    & Pick<Address, 'id'>
+  ) }
+);
 
 export type GetMenuQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2755,7 +2974,252 @@ export type GetSingleProductVariantQuery = (
   ) }
 );
 
+export type GetProductAssetQueryVariables = Exact<{
+  prodId?: Maybe<Scalars['ID']>;
+  variantId?: Maybe<Scalars['ID']>;
+}>;
 
+
+export type GetProductAssetQuery = (
+  { __typename?: 'Query' }
+  & { getProductAsset: (
+    { __typename?: 'Asset' }
+    & Pick<Asset, 'id' | 'preview' | 'source'>
+  ) }
+);
+
+export type GetDefaultStoreQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDefaultStoreQuery = (
+  { __typename?: 'Query' }
+  & { GetDefaultStore: (
+    { __typename?: 'Store' }
+    & Pick<Store, 'id' | 'storeName' | 'phoneNumber' | 'officialemail'>
+  ) }
+);
+
+export type GetCollectionTreeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCollectionTreeQuery = (
+  { __typename?: 'Query' }
+  & { GetCollectionTree: Array<(
+    { __typename?: 'Collection' }
+    & Pick<Collection, 'id' | 'name'>
+    & { children: Array<(
+      { __typename?: 'Collection' }
+      & Pick<Collection, 'id' | 'name'>
+      & { children: Array<(
+        { __typename?: 'Collection' }
+        & Pick<Collection, 'id' | 'name'>
+      )> }
+    )> }
+  )> }
+);
+
+export type GetSingleCollectionQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetSingleCollectionQuery = (
+  { __typename?: 'Query' }
+  & { GetSingleCollection: (
+    { __typename?: 'CollectionSingleResponse' }
+    & { collection: (
+      { __typename?: 'Collection' }
+      & Pick<Collection, 'id' | 'name' | 'description'>
+      & { children: Array<(
+        { __typename?: 'Collection' }
+        & Pick<Collection, 'id' | 'name'>
+      )> }
+    ), facetValues: Array<(
+      { __typename?: 'FacetValue' }
+      & Pick<FacetValue, 'id' | 'code'>
+      & { facet: (
+        { __typename?: 'Facet' }
+        & Pick<Facet, 'id' | 'code' | 'name'>
+      ) }
+    )> }
+  ) }
+);
+
+export type GetFacetsByCollectionQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetFacetsByCollectionQuery = (
+  { __typename?: 'Query' }
+  & { GetFacetsByCollection: Array<(
+    { __typename?: 'FacetValue' }
+    & Pick<FacetValue, 'id' | 'code'>
+    & { facet: (
+      { __typename?: 'Facet' }
+      & Pick<Facet, 'id' | 'name' | 'code'>
+    ) }
+  )> }
+);
+
+export type GetProductVariantForCollectionQueryVariables = Exact<{
+  id: Scalars['ID'];
+  limit?: Maybe<Scalars['Int']>;
+  search?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetProductVariantForCollectionQuery = (
+  { __typename?: 'Query' }
+  & { GetProductVariantForCollection: Array<(
+    { __typename?: 'ProductVariant' }
+    & Pick<ProductVariant, 'id' | 'name'>
+    & { asset: (
+      { __typename?: 'ProductVariantAsset' }
+      & Pick<ProductVariantAsset, 'id'>
+      & { asset: (
+        { __typename?: 'Asset' }
+        & Pick<Asset, 'id' | 'preview' | 'source'>
+      ) }
+    ) }
+  )> }
+);
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = (
+  { __typename?: 'Query' }
+  & { GetCurrentUser: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'email' | 'verified' | 'verificationToken' | 'lastLogin' | 'firstName' | 'lastName' | 'phoneNumber'>
+  ) }
+);
+
+export type GetUserAddressQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserAddressQuery = (
+  { __typename?: 'Query' }
+  & { GetUserAddress: Array<(
+    { __typename?: 'Address' }
+    & Pick<Address, 'id' | 'fullName' | 'addressLine' | 'city' | 'state' | 'landmark' | 'postalCode' | 'phoneNumber' | 'addressType'>
+  )> }
+);
+
+
+export const LoginUserDocument = gql`
+    mutation LoginUser($email: String!, $password: String!) {
+  LoginUser(email: $email, password: $password) {
+    user {
+      id
+      email
+      phoneNumber
+    }
+    token
+  }
+}
+    `;
+export type LoginUserMutationFn = Apollo.MutationFunction<LoginUserMutation, LoginUserMutationVariables>;
+
+/**
+ * __useLoginUserMutation__
+ *
+ * To run a mutation, you first call `useLoginUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginUserMutation, { data, loading, error }] = useLoginUserMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useLoginUserMutation(baseOptions?: Apollo.MutationHookOptions<LoginUserMutation, LoginUserMutationVariables>) {
+        return Apollo.useMutation<LoginUserMutation, LoginUserMutationVariables>(LoginUserDocument, baseOptions);
+      }
+export type LoginUserMutationHookResult = ReturnType<typeof useLoginUserMutation>;
+export type LoginUserMutationResult = Apollo.MutationResult<LoginUserMutation>;
+export type LoginUserMutationOptions = Apollo.BaseMutationOptions<LoginUserMutation, LoginUserMutationVariables>;
+export const UpdateAccountInfoDocument = gql`
+    mutation UpdateAccountInfo($lname: String!, $fname: String!, $phone: String!) {
+  UpdateAccountInfo(lname: $lname, fname: $fname, phone: $phone) {
+    id
+    email
+  }
+}
+    `;
+export type UpdateAccountInfoMutationFn = Apollo.MutationFunction<UpdateAccountInfoMutation, UpdateAccountInfoMutationVariables>;
+
+/**
+ * __useUpdateAccountInfoMutation__
+ *
+ * To run a mutation, you first call `useUpdateAccountInfoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateAccountInfoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateAccountInfoMutation, { data, loading, error }] = useUpdateAccountInfoMutation({
+ *   variables: {
+ *      lname: // value for 'lname'
+ *      fname: // value for 'fname'
+ *      phone: // value for 'phone'
+ *   },
+ * });
+ */
+export function useUpdateAccountInfoMutation(baseOptions?: Apollo.MutationHookOptions<UpdateAccountInfoMutation, UpdateAccountInfoMutationVariables>) {
+        return Apollo.useMutation<UpdateAccountInfoMutation, UpdateAccountInfoMutationVariables>(UpdateAccountInfoDocument, baseOptions);
+      }
+export type UpdateAccountInfoMutationHookResult = ReturnType<typeof useUpdateAccountInfoMutation>;
+export type UpdateAccountInfoMutationResult = Apollo.MutationResult<UpdateAccountInfoMutation>;
+export type UpdateAccountInfoMutationOptions = Apollo.BaseMutationOptions<UpdateAccountInfoMutation, UpdateAccountInfoMutationVariables>;
+export const CreateNewAddressDocument = gql`
+    mutation CreateNewAddress($fullName: String!, $addressLine: String!, $city: String!, $state: String!, $landmark: String!, $postalCode: String!, $phoneNumber: String!, $type: AddressType!) {
+  CreateNewAddress(fullName: $fullName, addressLine: $addressLine, city: $city, state: $state, landmark: $landmark, postalCode: $postalCode, phoneNumber: $phoneNumber, type: $type) {
+    id
+  }
+}
+    `;
+export type CreateNewAddressMutationFn = Apollo.MutationFunction<CreateNewAddressMutation, CreateNewAddressMutationVariables>;
+
+/**
+ * __useCreateNewAddressMutation__
+ *
+ * To run a mutation, you first call `useCreateNewAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateNewAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createNewAddressMutation, { data, loading, error }] = useCreateNewAddressMutation({
+ *   variables: {
+ *      fullName: // value for 'fullName'
+ *      addressLine: // value for 'addressLine'
+ *      city: // value for 'city'
+ *      state: // value for 'state'
+ *      landmark: // value for 'landmark'
+ *      postalCode: // value for 'postalCode'
+ *      phoneNumber: // value for 'phoneNumber'
+ *      type: // value for 'type'
+ *   },
+ * });
+ */
+export function useCreateNewAddressMutation(baseOptions?: Apollo.MutationHookOptions<CreateNewAddressMutation, CreateNewAddressMutationVariables>) {
+        return Apollo.useMutation<CreateNewAddressMutation, CreateNewAddressMutationVariables>(CreateNewAddressDocument, baseOptions);
+      }
+export type CreateNewAddressMutationHookResult = ReturnType<typeof useCreateNewAddressMutation>;
+export type CreateNewAddressMutationResult = Apollo.MutationResult<CreateNewAddressMutation>;
+export type CreateNewAddressMutationOptions = Apollo.BaseMutationOptions<CreateNewAddressMutation, CreateNewAddressMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -2962,3 +3426,327 @@ export function useGetSingleProductVariantLazyQuery(baseOptions?: Apollo.LazyQue
 export type GetSingleProductVariantQueryHookResult = ReturnType<typeof useGetSingleProductVariantQuery>;
 export type GetSingleProductVariantLazyQueryHookResult = ReturnType<typeof useGetSingleProductVariantLazyQuery>;
 export type GetSingleProductVariantQueryResult = Apollo.QueryResult<GetSingleProductVariantQuery, GetSingleProductVariantQueryVariables>;
+export const GetProductAssetDocument = gql`
+    query getProductAsset($prodId: ID, $variantId: ID) {
+  getProductAsset(prodId: $prodId, variantId: $variantId) {
+    id
+    preview
+    source
+  }
+}
+    `;
+
+/**
+ * __useGetProductAssetQuery__
+ *
+ * To run a query within a React component, call `useGetProductAssetQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductAssetQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductAssetQuery({
+ *   variables: {
+ *      prodId: // value for 'prodId'
+ *      variantId: // value for 'variantId'
+ *   },
+ * });
+ */
+export function useGetProductAssetQuery(baseOptions?: Apollo.QueryHookOptions<GetProductAssetQuery, GetProductAssetQueryVariables>) {
+        return Apollo.useQuery<GetProductAssetQuery, GetProductAssetQueryVariables>(GetProductAssetDocument, baseOptions);
+      }
+export function useGetProductAssetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductAssetQuery, GetProductAssetQueryVariables>) {
+          return Apollo.useLazyQuery<GetProductAssetQuery, GetProductAssetQueryVariables>(GetProductAssetDocument, baseOptions);
+        }
+export type GetProductAssetQueryHookResult = ReturnType<typeof useGetProductAssetQuery>;
+export type GetProductAssetLazyQueryHookResult = ReturnType<typeof useGetProductAssetLazyQuery>;
+export type GetProductAssetQueryResult = Apollo.QueryResult<GetProductAssetQuery, GetProductAssetQueryVariables>;
+export const GetDefaultStoreDocument = gql`
+    query GetDefaultStore {
+  GetDefaultStore {
+    id
+    storeName
+    phoneNumber
+    officialemail
+  }
+}
+    `;
+
+/**
+ * __useGetDefaultStoreQuery__
+ *
+ * To run a query within a React component, call `useGetDefaultStoreQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDefaultStoreQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDefaultStoreQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDefaultStoreQuery(baseOptions?: Apollo.QueryHookOptions<GetDefaultStoreQuery, GetDefaultStoreQueryVariables>) {
+        return Apollo.useQuery<GetDefaultStoreQuery, GetDefaultStoreQueryVariables>(GetDefaultStoreDocument, baseOptions);
+      }
+export function useGetDefaultStoreLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultStoreQuery, GetDefaultStoreQueryVariables>) {
+          return Apollo.useLazyQuery<GetDefaultStoreQuery, GetDefaultStoreQueryVariables>(GetDefaultStoreDocument, baseOptions);
+        }
+export type GetDefaultStoreQueryHookResult = ReturnType<typeof useGetDefaultStoreQuery>;
+export type GetDefaultStoreLazyQueryHookResult = ReturnType<typeof useGetDefaultStoreLazyQuery>;
+export type GetDefaultStoreQueryResult = Apollo.QueryResult<GetDefaultStoreQuery, GetDefaultStoreQueryVariables>;
+export const GetCollectionTreeDocument = gql`
+    query GetCollectionTree {
+  GetCollectionTree {
+    id
+    name
+    children {
+      id
+      name
+      children {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCollectionTreeQuery__
+ *
+ * To run a query within a React component, call `useGetCollectionTreeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCollectionTreeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCollectionTreeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCollectionTreeQuery(baseOptions?: Apollo.QueryHookOptions<GetCollectionTreeQuery, GetCollectionTreeQueryVariables>) {
+        return Apollo.useQuery<GetCollectionTreeQuery, GetCollectionTreeQueryVariables>(GetCollectionTreeDocument, baseOptions);
+      }
+export function useGetCollectionTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCollectionTreeQuery, GetCollectionTreeQueryVariables>) {
+          return Apollo.useLazyQuery<GetCollectionTreeQuery, GetCollectionTreeQueryVariables>(GetCollectionTreeDocument, baseOptions);
+        }
+export type GetCollectionTreeQueryHookResult = ReturnType<typeof useGetCollectionTreeQuery>;
+export type GetCollectionTreeLazyQueryHookResult = ReturnType<typeof useGetCollectionTreeLazyQuery>;
+export type GetCollectionTreeQueryResult = Apollo.QueryResult<GetCollectionTreeQuery, GetCollectionTreeQueryVariables>;
+export const GetSingleCollectionDocument = gql`
+    query GetSingleCollection($id: ID!) {
+  GetSingleCollection(id: $id) {
+    collection {
+      id
+      name
+      description
+      children {
+        id
+        name
+      }
+    }
+    facetValues {
+      id
+      code
+      facet {
+        id
+        code
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSingleCollectionQuery__
+ *
+ * To run a query within a React component, call `useGetSingleCollectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSingleCollectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSingleCollectionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetSingleCollectionQuery(baseOptions?: Apollo.QueryHookOptions<GetSingleCollectionQuery, GetSingleCollectionQueryVariables>) {
+        return Apollo.useQuery<GetSingleCollectionQuery, GetSingleCollectionQueryVariables>(GetSingleCollectionDocument, baseOptions);
+      }
+export function useGetSingleCollectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSingleCollectionQuery, GetSingleCollectionQueryVariables>) {
+          return Apollo.useLazyQuery<GetSingleCollectionQuery, GetSingleCollectionQueryVariables>(GetSingleCollectionDocument, baseOptions);
+        }
+export type GetSingleCollectionQueryHookResult = ReturnType<typeof useGetSingleCollectionQuery>;
+export type GetSingleCollectionLazyQueryHookResult = ReturnType<typeof useGetSingleCollectionLazyQuery>;
+export type GetSingleCollectionQueryResult = Apollo.QueryResult<GetSingleCollectionQuery, GetSingleCollectionQueryVariables>;
+export const GetFacetsByCollectionDocument = gql`
+    query GetFacetsByCollection($id: ID!) {
+  GetFacetsByCollection(id: $id) {
+    id
+    code
+    facet {
+      id
+      name
+      code
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFacetsByCollectionQuery__
+ *
+ * To run a query within a React component, call `useGetFacetsByCollectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFacetsByCollectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFacetsByCollectionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetFacetsByCollectionQuery(baseOptions?: Apollo.QueryHookOptions<GetFacetsByCollectionQuery, GetFacetsByCollectionQueryVariables>) {
+        return Apollo.useQuery<GetFacetsByCollectionQuery, GetFacetsByCollectionQueryVariables>(GetFacetsByCollectionDocument, baseOptions);
+      }
+export function useGetFacetsByCollectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFacetsByCollectionQuery, GetFacetsByCollectionQueryVariables>) {
+          return Apollo.useLazyQuery<GetFacetsByCollectionQuery, GetFacetsByCollectionQueryVariables>(GetFacetsByCollectionDocument, baseOptions);
+        }
+export type GetFacetsByCollectionQueryHookResult = ReturnType<typeof useGetFacetsByCollectionQuery>;
+export type GetFacetsByCollectionLazyQueryHookResult = ReturnType<typeof useGetFacetsByCollectionLazyQuery>;
+export type GetFacetsByCollectionQueryResult = Apollo.QueryResult<GetFacetsByCollectionQuery, GetFacetsByCollectionQueryVariables>;
+export const GetProductVariantForCollectionDocument = gql`
+    query GetProductVariantForCollection($id: ID!, $limit: Int, $search: String) {
+  GetProductVariantForCollection(id: $id, limit: $limit, search: $search) {
+    id
+    name
+    asset {
+      id
+      asset {
+        id
+        preview
+        source
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProductVariantForCollectionQuery__
+ *
+ * To run a query within a React component, call `useGetProductVariantForCollectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductVariantForCollectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductVariantForCollectionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useGetProductVariantForCollectionQuery(baseOptions?: Apollo.QueryHookOptions<GetProductVariantForCollectionQuery, GetProductVariantForCollectionQueryVariables>) {
+        return Apollo.useQuery<GetProductVariantForCollectionQuery, GetProductVariantForCollectionQueryVariables>(GetProductVariantForCollectionDocument, baseOptions);
+      }
+export function useGetProductVariantForCollectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductVariantForCollectionQuery, GetProductVariantForCollectionQueryVariables>) {
+          return Apollo.useLazyQuery<GetProductVariantForCollectionQuery, GetProductVariantForCollectionQueryVariables>(GetProductVariantForCollectionDocument, baseOptions);
+        }
+export type GetProductVariantForCollectionQueryHookResult = ReturnType<typeof useGetProductVariantForCollectionQuery>;
+export type GetProductVariantForCollectionLazyQueryHookResult = ReturnType<typeof useGetProductVariantForCollectionLazyQuery>;
+export type GetProductVariantForCollectionQueryResult = Apollo.QueryResult<GetProductVariantForCollectionQuery, GetProductVariantForCollectionQueryVariables>;
+export const GetCurrentUserDocument = gql`
+    query GetCurrentUser {
+  GetCurrentUser {
+    id
+    email
+    verified
+    verificationToken
+    lastLogin
+    firstName
+    lastName
+    phoneNumber
+  }
+}
+    `;
+
+/**
+ * __useGetCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+        return Apollo.useQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, baseOptions);
+      }
+export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+          return Apollo.useLazyQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, baseOptions);
+        }
+export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
+export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
+export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetUserAddressDocument = gql`
+    query GetUserAddress {
+  GetUserAddress {
+    id
+    fullName
+    addressLine
+    city
+    state
+    landmark
+    postalCode
+    phoneNumber
+    addressType
+  }
+}
+    `;
+
+/**
+ * __useGetUserAddressQuery__
+ *
+ * To run a query within a React component, call `useGetUserAddressQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserAddressQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserAddressQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserAddressQuery(baseOptions?: Apollo.QueryHookOptions<GetUserAddressQuery, GetUserAddressQueryVariables>) {
+        return Apollo.useQuery<GetUserAddressQuery, GetUserAddressQueryVariables>(GetUserAddressDocument, baseOptions);
+      }
+export function useGetUserAddressLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserAddressQuery, GetUserAddressQueryVariables>) {
+          return Apollo.useLazyQuery<GetUserAddressQuery, GetUserAddressQueryVariables>(GetUserAddressDocument, baseOptions);
+        }
+export type GetUserAddressQueryHookResult = ReturnType<typeof useGetUserAddressQuery>;
+export type GetUserAddressLazyQueryHookResult = ReturnType<typeof useGetUserAddressLazyQuery>;
+export type GetUserAddressQueryResult = Apollo.QueryResult<GetUserAddressQuery, GetUserAddressQueryVariables>;

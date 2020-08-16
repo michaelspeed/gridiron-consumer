@@ -98,3 +98,112 @@ query getSingleProductVariant($id: ID!){
         }
     }
 }
+
+query getProductAsset($prodId: ID, $variantId: ID) {
+    getProductAsset(prodId: $prodId, variantId: $variantId) {
+        id
+        preview
+        source
+    }
+}
+
+query GetDefaultStore {
+    GetDefaultStore {
+        id
+        storeName
+        phoneNumber
+        officialemail
+    }
+}
+
+query GetCollectionTree {
+    GetCollectionTree {
+        id
+        name
+        children {
+            id
+            name
+            children {
+                id
+                name
+            }
+        }
+    }
+}
+
+query GetSingleCollection($id: ID!){
+    GetSingleCollection(id: $id) {
+        collection {
+            id
+            name
+            description
+            children {
+                id
+                name
+            }
+        }
+        facetValues {
+            id
+            code
+            facet {
+                id
+                code
+                name
+            }
+        }
+    }
+}
+
+query GetFacetsByCollection($id: ID!) {
+    GetFacetsByCollection(id: $id){
+        id
+        code
+        facet {
+            id
+            name
+            code
+        }
+    }
+}
+
+query GetProductVariantForCollection($id: ID!, $limit: Int, $search: String){
+    GetProductVariantForCollection(id: $id, limit: $limit, search: $search) {
+        id
+        name
+        asset{
+            id
+            asset{
+                id
+                preview
+                source
+            }
+        }
+    }
+}
+
+query GetCurrentUser {
+    GetCurrentUser {
+        id
+        email
+        verified
+        verificationToken
+        lastLogin
+        firstName
+        lastName
+        phoneNumber
+    }
+}
+
+query GetUserAddress {
+    GetUserAddress {
+        id
+        fullName
+        addressLine
+        city
+        state
+        landmark
+        postalCode
+        phoneNumber
+        addressType
+    }
+}

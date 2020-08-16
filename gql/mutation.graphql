@@ -1,0 +1,32 @@
+mutation LoginUser($email: String!, $password: String!) {
+    LoginUser(email: $email, password: $password){
+        user {
+            id
+            email
+            phoneNumber
+        }
+        token
+    }
+}
+
+mutation UpdateAccountInfo($lname: String!, $fname: String!, $phone: String!) {
+    UpdateAccountInfo(lname: $lname, fname: $fname, phone: $phone) {
+        id
+        email
+    }
+}
+
+mutation CreateNewAddress($fullName: String!, $addressLine: String!, $city: String!, $state: String!, $landmark: String!, $postalCode: String!, $phoneNumber: String!, $type: AddressType!){
+    CreateNewAddress(
+        fullName: $fullName,
+        addressLine: $addressLine,
+        city: $city,
+        state: $state,
+        landmark: $landmark,
+        postalCode: $postalCode,
+        phoneNumber: $phoneNumber,
+        type:$type
+    ) {
+        id
+    }
+}

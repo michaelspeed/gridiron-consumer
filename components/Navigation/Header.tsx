@@ -1,14 +1,65 @@
 import React, {useEffect, useState} from "react"
 import {CardSideBar} from "../Cart/CartSideBar";
 import CollectionSelect from "./CollectionSelect";
+import {Collection, GetCollectionTreeDocument, GetCurrentUserDocument, LoginUserDocument, Store} from "../../gql";
+import {useMutation, useQuery} from "@apollo/client";
+import {Button, Dropdown, Input, Menu, message, Modal} from "antd";
+import {useRouter, withRouter} from "next/router";
+import {primary} from "../../utils/colorConfig";
+import {GridIronConstants} from "../../utils/globalconstants";
+import {observer} from "mobx-react";
+import {useStore} from "../../store/store";
+import { UserOutlined } from '@ant-design/icons';
 
 interface Props {
-    menu: string
+    menu: string,
+    store: Store
 }
 
-const Header = ({menu}: Props) => {
+const { SubMenu } = Menu;
+
+const Header = observer(({menu, store}: Props) => {
 
     const [menuTree, setMenuTree] = useState<any[]>([])
+
+    const {setStoreLogin, user} = useStore(null)
+
+    const {...coltree} = useQuery(GetCollectionTreeDocument)
+
+    const [login, setLogin] = useState(false)
+    const [register, setRegister] = useState(false)
+    const [loading, setLoading] = useState(false)
+
+    const [lemail, setLEmail] = useState('')
+    const [lpass, setLPass] = useState('')
+
+    const [rrmail, setREmail] = useState('')
+    const [rpass, setRPass] = useState('')
+    const [rphone, setRPhone] = useState('')
+
+    const navig = useRouter()
+
+    const {...currUser} = useQuery(GetCurrentUserDocument, {pollInterval: 3000})
+
+    useEffect(() => {
+        if (currUser.data) {
+            setStoreLogin({
+                id: currUser.data.GetCurrentUser.id,
+                email: currUser.data.GetCurrentUser.email,
+                phone: currUser.data.GetCurrentUser.phoneNumber,
+                verified: currUser.data.GetCurrentUser.verified,
+                firstName: currUser.data.GetCurrentUser.firstName,
+                lastName: currUser.data.GetCurrentUser.lastName
+            })
+        }
+    }, [currUser.data])
+
+    const [LoginUser] = useMutation(LoginUserDocument, {
+        variables: {
+            email: lemail,
+            password: lpass
+        }
+    })
 
     useEffect(() => {
         setMenuTree(JSON.parse(menu))
@@ -21,43 +72,33 @@ const Header = ({menu}: Props) => {
                     <div className="header-large-device">
                         <div className="header-top bg-gray-4 header-top-ptb-1">
                             <div className="container-fluid">
-                                <div className="row">
+                                <div className="row mt-2">
                                     <div className="col-lg-6">
                                         <div className="header-contact-number">
-                                            <span>+123 421 321</span>
+                                            <span>{store.phoneNumber}</span>
                                         </div>
                                     </div>
                                     <div className="col-lg-6">
                                         <div className="header-top-right header-top-flex">
-                                            <div className="language-wrap">
-                                                <a className="language-dropdown-active" href="#"><img
-                                                    src="/images/icon-img/flag.png" alt=""/></a>
-                                                <div className="language-dropdown">
-                                                    <ul>
-                                                        <li><a href="#">English</a></li>
-                                                        <li><a href="#">Spanish</a></li>
-                                                        <li><a href="#">Hindi </a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
                                             <div className="login-reg ml-40">
-                                                <ul>
-                                                    <li><a href="#">Log in</a></li>
-                                                    <li><a href="#">Create Account</a></li>
-                                                </ul>
+                                                {!user && <ul>
+                                                    <li><a href="javascript:;" onClick={() => setLogin(true)}>Log in</a></li>
+                                                    <li><a href="javascript:;" onClick={() => setRegister(true)}>Create Account</a></li>
+                                                </ul>}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="header-bottom sticky-bar">
+                        <div className="header-bottom sticky-bar" style={{marginTop: -10}}>
                             <div className="container-fluid">
                                 <div className="header-bottom-flex">
                                     <div className="logo-menu-wrap">
                                         <div className="logo">
-                                            <a href="index.html">
-                                                <img src="/images/logo/logo-2.png" alt="logo"/>
+                                            <a href="javascript:;" onClick={() => navig.push('/')} style={{textDecoration: "none"}}>
+                                                {/*<img src="/images/logo/logo-2.png" alt="logo"/>*/}
+                                                <h2 style={{color: primary}}>{store.storeName}</h2>
                                             </a>
                                         </div>
                                         <div className="main-menu menu-lh-1 main-menu-padding-1 menu-mrg-1">
@@ -66,7 +107,7 @@ const Header = ({menu}: Props) => {
                                                     {menuTree.map((item: any) => (
                                                         <li>
                                                             <a href="index.html">{item.title}</a>
-                                                            <ul className="mega-menu-style-1 mega-menu-width1 menu-negative-mrg1">
+                                                            <ul className="mega-menu-style-1 mega-menu-width1 menu-negative-mrg1" style={{backgroundColor: primary}}>
                                                                 {item.children !== undefined && item.children.length > 0
                                                                 && item.children.map((child) => {
                                                                     return (
@@ -74,7 +115,7 @@ const Header = ({menu}: Props) => {
                                                                             <a className="menu-title" href="#">{child.title}</a>
                                                                             <ul>
                                                                                 {child.children !== undefined && child.children.length > 0
-                                                                                    && child.children.map((lilMenu) => (
+                                                                                && child.children.map((lilMenu) => (
                                                                                     <li><a href="index.html">{lilMenu.title}</a></li>
                                                                                 ))}
                                                                             </ul>
@@ -90,7 +131,49 @@ const Header = ({menu}: Props) => {
                                     </div>
                                     <div className="header-action-wrap header-action-flex header-action-width">
                                         <div className="categories-dropdown">
-                                            <CollectionSelect/>
+                                            {!coltree.loading && !coltree.error && <Dropdown overlay={() => (
+                                                <Menu>
+                                                    {coltree.data.GetCollectionTree.map((coles: Collection) => {
+                                                        if (coles.name !== 'default') {
+                                                            if (coles.children.length > 0) {
+                                                                return (
+                                                                    <SubMenu onTitleClick={() => navig.push(`/collection/${coles.id}`)} title={<span className='text-black-50' style={{fontFamily: 'Poppins'}} >{coles.name}</span>}>
+                                                                        {coles.children.map(sub => {
+                                                                            if (sub.children.length > 0) {
+                                                                                return (
+                                                                                    <SubMenu onTitleClick={() => navig.push(`/collection/${sub.id}`)} title={<span className='text-black-50' style={{fontFamily: 'Poppins'}} >{sub.name}</span>}>
+                                                                                        {sub.children.map(moresub => (
+                                                                                            <Menu.Item key={moresub.id} onClick={() => navig.push(`/collection/${moresub.id}`)}>
+                                                                                                <span className='text-black-50' style={{fontFamily: 'Poppins'}} >{moresub.name}</span>
+                                                                                            </Menu.Item>
+                                                                                        ))}
+                                                                                    </SubMenu>
+                                                                                )
+                                                                            } else {
+                                                                                return (
+                                                                                    <Menu.Item key={sub.id} onClick={() => navig.push(`/collection/${sub.id}`)}>
+                                                                                        <span className='text-black-50' style={{fontFamily: 'Poppins'}} >{sub.name}</span>
+                                                                                    </Menu.Item>
+                                                                                )
+                                                                            }
+                                                                        })}
+                                                                    </SubMenu>
+                                                                )
+                                                            } else {
+                                                                return (
+                                                                    <Menu.Item key={coles.id} onClick={() => navig.push(`/collection/${coles.id}`)}>
+                                                                        <span className='text-black-50' style={{fontFamily: 'Poppins'}} >{coles.name}</span>
+                                                                    </Menu.Item>
+                                                                )
+                                                            }
+                                                        }
+                                                    })}
+                                                </Menu>
+                                            )}>
+                                                <Button style={{height: 45}}>
+                                                    Browse By Category
+                                                </Button>
+                                            </Dropdown>}
                                         </div>
                                         <div className="search-style-2 mr-20">
                                             <form>
@@ -98,9 +181,9 @@ const Header = ({menu}: Props) => {
                                                     <input className="input-text" value=""
                                                            placeholder="Type to search (Ex: Phone, Laptop)"
                                                            type="search"/>
-                                                        <button>
-                                                            <i className="icofont-search-1"></i>
-                                                        </button>
+                                                    <button>
+                                                        <i className="icofont-search-1"></i>
+                                                    </button>
                                                 </div>
                                             </form>
                                         </div>
@@ -108,6 +191,34 @@ const Header = ({menu}: Props) => {
                                             <a className="cart-active" href="#"><i
                                                 className="icofont-shopping-cart"></i></a>
                                         </div>
+                                        {user && <div className="same-style header-cart ml-5">
+                                            <Dropdown overlay={() => (
+                                                <Menu>
+                                                    <Menu.Item>
+                                                        <a href="javascript:;">
+                                                            Order
+                                                        </a>
+                                                    </Menu.Item>
+                                                    <Menu.Item>
+                                                        <a href="javascript:;" onClick={() => navig.push('/accounts?q=profile')}>
+                                                            My Profile
+                                                        </a>
+                                                    </Menu.Item>
+                                                    <Menu.Item>
+                                                        <a href="javascript:;">
+                                                            My Addresses
+                                                        </a>
+                                                    </Menu.Item>
+                                                    <Menu.Item danger>
+                                                        Logout
+                                                    </Menu.Item>
+                                                </Menu>
+                                            )}>
+                                                <a onClick={e => e.preventDefault()} >
+                                                    <i className="icofont-user-alt-3"></i>
+                                                </a>
+                                            </Dropdown>
+                                        </div>}
                                     </div>
                                 </div>
                             </div>
@@ -119,7 +230,7 @@ const Header = ({menu}: Props) => {
                                 <div className="col-6">
                                     <div className="mobile-logo mobile-logo-width">
                                         <a href="index.html">
-                                            <img alt="" src="assets/images/logo/logo-2.png"/>
+                                            <h2 style={{color: primary}}>{store.storeName}</h2>
                                         </a>
                                     </div>
                                 </div>
@@ -151,7 +262,7 @@ const Header = ({menu}: Props) => {
                         <div className="mobile-search">
                             <form className="search-form" action="#">
                                 <input type="text" placeholder="Search here…"/>
-                                    <button className="button-search"><i className="icofont-search-1"></i></button>
+                                <button className="button-search"><i className="icofont-search-1"></i></button>
                             </form>
                         </div>
                         <div className="clickable-mainmenu-wrap clickable-mainmenu-style1">
@@ -191,8 +302,57 @@ const Header = ({menu}: Props) => {
                     </div>
                 </div>
             </div>
+            <Modal visible={login} footer={null} title={<h6 style={{color: primary, marginBottom: -10}}>Login</h6>} closable={false} onCancel={() => setLogin(false)}>
+                <div className='container'>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Email or Phone</label>
+                        <Input placeholder="Email or Phone" value={lemail} onChange={event => setLEmail(event.target.value)}/>
+                    </div>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Password</label>
+                        <Input placeholder="Password" type={"password"} value={lpass} onChange={event => setLPass(event.target.value)}/>
+                    </div>
+                    <div>
+                        <Button type={"primary"} loading={loading}
+                                onClick={() => {
+                                    setLoading(true)
+                                    LoginUser()
+                                        .then(value => {
+                                            setLoading(false)
+                                            setLogin(false)
+                                            console.log(value)
+                                            localStorage.setItem(GridIronConstants, value.data.LoginUser.token)
+                                        })
+                                        .catch(error => {
+                                            setLoading(false)
+                                            message.error(error.message)
+                                        })
+                                }}
+                        >Login</Button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal visible={register} footer={null} title={<h6 style={{color: primary, marginBottom: -10}}>Register</h6>} closable={false} onCancel={() => setRegister(false)}>
+                <div className='container'>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Email</label>
+                        <Input placeholder="Email" value={rrmail} onChange={event => setREmail(event.target.value)}/>
+                    </div>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Phone</label>
+                        <Input placeholder="Phone" value={rphone} onChange={event => setRPhone(event.target.value)}/>
+                    </div>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Password</label>
+                        <Input placeholder="Password" value={rpass} onChange={event => setRPass(event.target.value)}/>
+                    </div>
+                    <div>
+                        <Button type={"primary"}>Register</Button>
+                    </div>
+                </div>
+            </Modal>
         </React.Fragment>
     )
-}
+})
 
-export default Header
+export default withRouter<any>(Header)

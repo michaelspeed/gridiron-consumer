@@ -61,9 +61,9 @@
                 border: none;
                 padding: 0;
                 z-index: 99;
-                background: #262836 url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                background: #262836 url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                 &:hover {
-                    background: $theme-color-dark-blue url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                    background: $theme-color-dark-blue url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                 }
                 input {
                     background-color: transparent;
@@ -71,21 +71,21 @@
                     height: 40px;
                 }
                 &.yellow-arrow {
-                    background: #FFE600 url("../../assets/images/icon-img/right-arrow-black.png") no-repeat scroll right 15px center;
+                    background: #FFE600 url("../images/icon-img/right-arrow-black.png") no-repeat scroll right 15px center;
                     &:hover {
-                        background: $theme-color-dark-blue url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                        background: $theme-color-dark-blue url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     }
                 }
                 &.green-arrow {
-                    background: $theme-color-green-2 url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                    background: $theme-color-green-2 url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     &:hover {
-                        background: $theme-color-dark-blue url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                        background: $theme-color-dark-blue url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     }
                 }
                 &.brown-arrow {
-                    background: $theme-color-brown url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                    background: $theme-color-brown url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     &:hover {
-                        background: $theme-color-black url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                        background: $theme-color-black url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     }
                 }
             }
@@ -107,9 +107,9 @@
                     }
                 }
                 .clear {
-                    background: $white url("../../assets/images/icon-img/right-arrow-pink.png") no-repeat scroll right 15px center;
+                    background: $white url("../images/icon-img/right-arrow-pink.png") no-repeat scroll right 15px center;
                     &:hover {
-                        background: $theme-color-dark-blue url("../../assets/images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
+                        background: $theme-color-dark-blue url("../images/icon-img/right-arrow.png") no-repeat scroll right 15px center;
                     }
                     input {
                         background-color: transparent;

@@ -1532,7 +1532,7 @@
 .kids-slider-area {
     position: relative;
     &::before {
-        background-image: url(../../assets/images/icon-img/kids-slider.png);
+        /*background-image: url(../../assets/images/icon-img/kids-slider.png);*/
         position: absolute;
         content: "";
         left: 0;
@@ -1742,7 +1742,7 @@
 .kids-3-single-slider {
     position: relative;
     &::before {
-        background-image: url(../../assets/images/icon-img/kids-3-rectangle.png);
+        /*background-image: url(../../assets/images/icon-img/kids-3-rectangle.png);*/
         position: absolute;
         content: "";
         left: 0;

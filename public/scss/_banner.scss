@@ -644,7 +644,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-image: url(../../assets/images/banner/banner-shape-electric.png);
+        /*background-image: url(../../assets/images/banner/banner-shape-electric.png);*/
         h3 {
             margin: 0;
             font-size: 25px;
@@ -1056,14 +1056,14 @@
                 font-size: 20px;
             }
             &::before {
-                content: url(../../assets/images/icon-img/organic-banner-shape-1.png);
+                /*content: url(../../assets/images/icon-img/organic-banner-shape-1.png);*/
                 position: absolute;
                 left: 0;
                 top: -37px;
                 bottom: auto;
             }
             &::after {
-                content: url(../../assets/images/icon-img/organic-banner-shape-1.png);
+                /*content: url(../../assets/images/icon-img/organic-banner-shape-1.png);*/
                 position: absolute;
                 left: 0;
                 bottom: -30px;

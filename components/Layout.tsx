@@ -3,14 +3,16 @@ import Head from 'next/head'
 import Header from "./Navigation/Header";
 import Footer from "./Footer/Footer";
 import withApollo from "../utils/withApollo";
+import {Store} from "../gql";
 
 type Props = {
     children?: ReactNode
     title?: string,
-    menu: string
+    menu: string,
+    store: Store
 }
 
-const Layout = ({children, menu, title = 'AirEcommerce'}: Props) => {
+const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
     return (
         <React.Fragment>
             <Head>
@@ -18,8 +20,10 @@ const Layout = ({children, menu, title = 'AirEcommerce'}: Props) => {
                 <meta charSet="utf-8"/>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
             </Head>
-            <Header menu={menu}/>
-            {children}
+            <div className="main-wrapper main-wrapper-3">
+                <Header menu={menu} store={store}/>
+                {children}
+            </div>
             <Footer/>
         </React.Fragment>
     )

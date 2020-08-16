@@ -2,18 +2,23 @@ import Layout from '../components/Layout'
 import useScripts from "../utils/useScript";
 import withApollo from "../utils/withApollo";
 import {NextPageContext} from "next";
-import {GetHomePageDocument, GetMenuDocument} from "../gql";
+import {GetDefaultStoreDocument, GetHomePageDocument, GetMenuDocument} from "../gql";
 import {assetsURL} from "../utils/globalconstants";
 import {useRouter} from "next/router";
+import HomePageListItem from "../components/Home/HomePageListItem";
+import {initializeStore} from "../store/store";
+import {getSnapshot} from "mobx-state-tree";
 
 interface Props {
   menu: any,
-  main: any
+  main: any,
+  list: any,
+  store: any
 }
 
-const IndexPage = ({menu, main}: Props) => {
+const IndexPage = ({menu, main, list, store}: Props) => {
   useScripts('/js/main.js')
-  console.log(main)
+
   const navig = useRouter()
 
   const onClickCarousel = (item) => {
@@ -23,7 +28,7 @@ const IndexPage = ({menu, main}: Props) => {
   }
 
   return (
-      <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu}>
+      <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
         <div className="slider-area bg-light-green slider-mt-1">
           <div className="slider-active-1 nav-style-1 dot-style-1">
             {main.map(item => (
@@ -51,6 +56,21 @@ const IndexPage = ({menu, main}: Props) => {
             <img src="/images/slider/shape-electric2.png" alt="shape"/>
           </div>
         </div>
+        <div className='pt-160'></div>
+        {list.map(listitem => (
+            <div className="product-area pb-155">
+              <div className="container">
+                <div className="section-title-8 mb-65">
+                  <h2>{listitem.name}</h2>
+                </div>
+                <div className="product-slider-active-4">
+                  {listitem.items.map(listsub => (
+                      <HomePageListItem item={listsub}/>
+                  ))}
+                </div>
+              </div>
+            </div>
+        ))}
       </Layout>
   )
 }
@@ -63,9 +83,18 @@ IndexPage.getInitialProps = async (ctx) => {
   const home = await client.query({
     query: GetHomePageDocument
   })
+  const defaultStore = await client.query({
+    query: GetDefaultStoreDocument
+  })
+
+  const store = initializeStore()
+
   return {
     menu,
-    main: home.data.getHomePage.single.main
+    main: home.data.getHomePage.single.main,
+    list: home.data.getHomePage.single.lists,
+    store: defaultStore.data.GetDefaultStore,
+    initialStore: getSnapshot(store)
   }
 }
 
