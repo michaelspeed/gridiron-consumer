@@ -12,15 +12,31 @@ const IUser = types.model({
     lastName: types.string
 })
 
+const IQType = types.model({
+    id: types.string,
+    type: types.enumeration('type', ['variant', 'product'])
+})
+
 const Store = types
     .model({
         user: types.maybeNull(IUser),
-        token: types.maybeNull(types.string)
+        token: types.maybeNull(types.string),
+        quickview: types.boolean,
+        qtype: types.maybeNull(IQType)
     }).actions(self => {
         const setStoreLogin = (user) => {
             self.user = user
         }
-        return {setStoreLogin}
+        const setQuickView = () => {
+            self.quickview = !self.quickview
+        }
+        const setQuickViewType = (id, type) => {
+            self.qtype = {id, type}
+        }
+        const setQuickViewNull = () => {
+            self.qtype = null
+        }
+        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull}
     })
 
 export type IStore = Instance<typeof Store>
@@ -28,7 +44,7 @@ export type IStoreSnapshotIn = SnapshotIn<typeof Store>
 export type IStoreSnapshotOut = SnapshotOut<typeof Store>
 
 export function initializeStore(snapshot = null) {
-    const _store = store ?? Store.create({user: null, token: null})
+    const _store = store ?? Store.create({user: null, token: null, quickview: false})
 
     if (snapshot) {
         applySnapshot(_store, snapshot)

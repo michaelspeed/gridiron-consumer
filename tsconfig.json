@@ -18,7 +18,7 @@
     "strict": true,
     "target": "esnext",
     "noImplicitAny": false,
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": false
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx"]

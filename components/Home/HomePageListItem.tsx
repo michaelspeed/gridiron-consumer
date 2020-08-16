@@ -1,6 +1,8 @@
 import {useQuery} from "@apollo/client";
 import {GetProductAssetDocument, GetProductAssetQueryVariables} from "../../gql";
 import {assetsURL} from "../../utils/globalconstants";
+import {useRouter} from "next/router";
+import {useStore} from "../../store/store";
 
 const HomePageListItem = ({item}) => {
 
@@ -10,6 +12,9 @@ const HomePageListItem = ({item}) => {
             prodId: item.type.key === 'product' ? item.target.target.id : undefined
         }
     })
+
+    const navig = useRouter()
+    const {setQuickView} = useStore(null)
 
     return (
         <div className="product-wrap-plr-1">
@@ -32,7 +37,9 @@ const HomePageListItem = ({item}) => {
                     <div className="product-action-wrap">
                         <div className="product-action-cart">
                             {item.type.key === 'product' && <button title="Add to Cart">Show all</button>}
-                            {item.type.key === 'variant' && <button title="Add to Cart">Quick View</button>}
+                            {item.type.key === 'variant' && <button title="Quick View" onClick={() => {
+                                setQuickView()
+                            }}>Quick View</button>}
                         </div>
                     </div>
                 </div>

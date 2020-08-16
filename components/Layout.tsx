@@ -4,6 +4,9 @@ import Header from "./Navigation/Header";
 import Footer from "./Footer/Footer";
 import withApollo from "../utils/withApollo";
 import {Store} from "../gql";
+import { Modal, ModalBody, ModalHeader } from "shards-react";
+import {observer} from "mobx-react";
+import {useStore} from "../store/store";
 
 type Props = {
     children?: ReactNode
@@ -13,6 +16,9 @@ type Props = {
 }
 
 const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
+
+    const {quickview, setQuickView} = useStore(null)
+
     return (
         <React.Fragment>
             <Head>
@@ -25,8 +31,14 @@ const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
                 {children}
             </div>
             <Footer/>
+            <Modal open={quickview} toggle={() => {
+                setQuickView()
+            }}>
+                <ModalHeader>Header</ModalHeader>
+                <ModalBody>👋 Hello there!</ModalBody>
+            </Modal>
         </React.Fragment>
     )
 }
 
-export default withApollo(Layout)
+export default withApollo(observer(Layout))
