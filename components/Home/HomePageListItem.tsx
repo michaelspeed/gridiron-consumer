@@ -14,7 +14,7 @@ const HomePageListItem = ({item}) => {
     })
 
     const navig = useRouter()
-    const {setQuickView} = useStore(null)
+    const {setQuickView, setQuickViewType} = useStore(null)
 
     return (
         <div className="product-wrap-plr-1">
@@ -36,8 +36,12 @@ const HomePageListItem = ({item}) => {
                     </div>
                     <div className="product-action-wrap">
                         <div className="product-action-cart">
-                            {item.type.key === 'product' && <button title="Add to Cart">Show all</button>}
+                            {item.type.key === 'product' && <button title="Show All" onClick={() => {
+                                setQuickViewType(item.target.target.id, 'product')
+                                setQuickView()
+                            }}>Show all</button>}
                             {item.type.key === 'variant' && <button title="Quick View" onClick={() => {
+                                setQuickViewType(item.target.target.id, 'variant')
                                 setQuickView()
                             }}>Quick View</button>}
                         </div>

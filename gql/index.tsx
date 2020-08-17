@@ -247,7 +247,7 @@ export type ProductVariantPrice = {
   taxIncluded: Scalars['Boolean'];
   tax: TaxRate;
   variant: ProductVariant;
-  store: Store;
+  store?: Maybe<Store>;
 };
 
 export type ProductOption = {
@@ -2725,6 +2725,7 @@ export type Query = {
   GetProductVariantForCollection: Array<ProductVariant>;
   getHomePage: Page;
   getSingleProductVariant: ProductVariant;
+  getProductVariantByProduct: Array<ProductVariant>;
   getProductAsset: Asset;
   GetDefaultStore: Store;
   GetCurrentUser: User;
@@ -2751,6 +2752,11 @@ export type QueryGetProductVariantForCollectionArgs = {
 
 
 export type QueryGetSingleProductVariantArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetProductVariantByProductArgs = {
   id: Scalars['ID'];
 };
 
@@ -2963,10 +2969,10 @@ export type GetSingleProductVariantQuery = (
     ), price?: Maybe<Array<(
       { __typename?: 'ProductVariantPrice' }
       & Pick<ProductVariantPrice, 'id' | 'price'>
-      & { store: (
+      & { store?: Maybe<(
         { __typename?: 'Store' }
         & Pick<Store, 'id' | 'storeName'>
-      ) }
+      )> }
     )>>, seo?: Maybe<(
       { __typename?: 'Seo' }
       & Pick<Seo, 'id' | 'urlKey' | 'metatitle' | 'metadesc' | 'metakeywords'>
@@ -3104,6 +3110,48 @@ export type GetUserAddressQuery = (
   & { GetUserAddress: Array<(
     { __typename?: 'Address' }
     & Pick<Address, 'id' | 'fullName' | 'addressLine' | 'city' | 'state' | 'landmark' | 'postalCode' | 'phoneNumber' | 'addressType'>
+  )> }
+);
+
+export type GetProductVariantByProductQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetProductVariantByProductQuery = (
+  { __typename?: 'Query' }
+  & { getProductVariantByProduct: Array<(
+    { __typename?: 'ProductVariant' }
+    & Pick<ProductVariant, 'id' | 'name'>
+    & { product: (
+      { __typename?: 'Product' }
+      & Pick<Product, 'id' | 'productName'>
+      & { options: Array<(
+        { __typename?: 'ProductOptionGroup' }
+        & Pick<ProductOptionGroup, 'id' | 'name' | 'code'>
+        & { options: Array<(
+          { __typename?: 'ProductOption' }
+          & Pick<ProductOption, 'id' | 'name' | 'code'>
+        )> }
+      )> }
+    ), asset: (
+      { __typename?: 'ProductVariantAsset' }
+      & Pick<ProductVariantAsset, 'id'>
+      & { asset: (
+        { __typename?: 'Asset' }
+        & Pick<Asset, 'id' | 'preview' | 'source'>
+      ) }
+    ), price?: Maybe<Array<(
+      { __typename?: 'ProductVariantPrice' }
+      & Pick<ProductVariantPrice, 'id' | 'price'>
+      & { store?: Maybe<(
+        { __typename?: 'Store' }
+        & Pick<Store, 'id' | 'storeName'>
+      )> }
+    )>>, seo?: Maybe<(
+      { __typename?: 'Seo' }
+      & Pick<Seo, 'id' | 'urlKey' | 'metatitle' | 'metadesc' | 'metakeywords'>
+    )> }
   )> }
 );
 
@@ -3750,3 +3798,74 @@ export function useGetUserAddressLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetUserAddressQueryHookResult = ReturnType<typeof useGetUserAddressQuery>;
 export type GetUserAddressLazyQueryHookResult = ReturnType<typeof useGetUserAddressLazyQuery>;
 export type GetUserAddressQueryResult = Apollo.QueryResult<GetUserAddressQuery, GetUserAddressQueryVariables>;
+export const GetProductVariantByProductDocument = gql`
+    query getProductVariantByProduct($id: ID!) {
+  getProductVariantByProduct(id: $id) {
+    id
+    name
+    product {
+      id
+      productName
+      options {
+        id
+        name
+        code
+        options {
+          id
+          name
+          code
+        }
+      }
+    }
+    asset {
+      id
+      asset {
+        id
+        preview
+        source
+      }
+    }
+    price {
+      id
+      price
+      store {
+        id
+        storeName
+      }
+    }
+    seo {
+      id
+      urlKey
+      metatitle
+      metadesc
+      metakeywords
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProductVariantByProductQuery__
+ *
+ * To run a query within a React component, call `useGetProductVariantByProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductVariantByProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductVariantByProductQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetProductVariantByProductQuery(baseOptions?: Apollo.QueryHookOptions<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>) {
+        return Apollo.useQuery<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>(GetProductVariantByProductDocument, baseOptions);
+      }
+export function useGetProductVariantByProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>) {
+          return Apollo.useLazyQuery<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>(GetProductVariantByProductDocument, baseOptions);
+        }
+export type GetProductVariantByProductQueryHookResult = ReturnType<typeof useGetProductVariantByProductQuery>;
+export type GetProductVariantByProductLazyQueryHookResult = ReturnType<typeof useGetProductVariantByProductLazyQuery>;
+export type GetProductVariantByProductQueryResult = Apollo.QueryResult<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>;

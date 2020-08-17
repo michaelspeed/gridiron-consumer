@@ -207,3 +207,47 @@ query GetUserAddress {
         addressType
     }
 }
+
+query getProductVariantByProduct($id: ID!){
+    getProductVariantByProduct(id: $id) {
+        id
+        name
+        product {
+            id
+            productName
+            options {
+                id
+                name
+                code
+                options {
+                    id
+                    name
+                    code
+                }
+            }
+        }
+        asset {
+            id
+            asset{
+                id
+                preview
+                source
+            }
+        }
+        price{
+            id
+            price
+            store {
+                id
+                storeName
+            }
+        }
+        seo {
+            id
+            urlKey
+            metatitle
+            metadesc
+            metakeywords
+        }
+    }
+}

@@ -4,9 +4,13 @@ import Header from "./Navigation/Header";
 import Footer from "./Footer/Footer";
 import withApollo from "../utils/withApollo";
 import {Store} from "../gql";
-import { Modal, ModalBody, ModalHeader } from "shards-react";
 import {observer} from "mobx-react";
 import {useStore} from "../store/store";
+import {IconButton, initializeIcons, Modal} from "office-ui-fabric-react";
+import VariantQuickView from "./QuickView/VariantQuickView";
+import {Drawer} from "@material-ui/core";
+
+initializeIcons()
 
 type Props = {
     children?: ReactNode
@@ -15,9 +19,11 @@ type Props = {
     store: Store
 }
 
+const cancelIcon = { iconName: 'Cancel' };
+
 const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
 
-    const {quickview, setQuickView} = useStore(null)
+    const {quickview, setQuickView, setQuickViewNull, qtype} = useStore(null)
 
     return (
         <React.Fragment>
@@ -31,11 +37,30 @@ const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
                 {children}
             </div>
             <Footer/>
-            <Modal open={quickview} toggle={() => {
+            <Drawer open={quickview} anchor={"bottom"} onClose={() => {
                 setQuickView()
+                setQuickViewNull()
             }}>
-                <ModalHeader>Header</ModalHeader>
-                <ModalBody>👋 Hello there!</ModalBody>
+                <div style={{padding: 20, overflow: "auto"}}>
+                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                        <h3>Quick View</h3>
+                        <IconButton
+                            iconProps={cancelIcon}
+                            ariaLabel="Close popup modal"
+                            onClick={() => {
+                                setQuickView()
+                                setQuickViewNull()
+                            }}
+                        />
+                    </div>
+                    <hr/>
+                    {qtype && <React.Fragment>
+                        {qtype!.type === 'product' && <VariantQuickView id={qtype!.id}/>}
+                    </React.Fragment>}
+                </div>
+            </Drawer>
+            <Modal >
+
             </Modal>
         </React.Fragment>
     )
