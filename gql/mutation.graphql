@@ -3,6 +3,11 @@ mutation LoginUser($email: String!, $password: String!) {
         user {
             id
             email
+            verified
+            verificationToken
+            lastLogin
+            firstName
+            lastName
             phoneNumber
         }
         token

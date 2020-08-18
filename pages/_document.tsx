@@ -24,6 +24,7 @@ export default class MyDocument extends Document<any> {
         return (
             <Html lang='en'>
                 <Head>
+                    <script src="/js/vendor/jquery-3.5.1.min.js"></script>
                     <link rel="stylesheet" href="/css/vendor/bootstrap.min.css"/>
                     <link rel="stylesheet" href="/css/vendor/vandella.css"/>
                     <link rel="stylesheet" href="/css/vendor/jellybelly.css"/>
@@ -35,9 +36,13 @@ export default class MyDocument extends Document<any> {
                     <link rel="stylesheet" href="/css/plugins/animate.css"/>
                     <link rel="stylesheet" href="/css/plugins/magnific-popup.css"/>
                     <link rel="stylesheet" href="/css/plugins/jquery-ui.css"/>
+                    <link rel="stylesheet" href="/css/plugins/carousel.css"/>
                     <link rel="stylesheet" href="/css/style.css"/>
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
                     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+                    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+                          integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+                          crossOrigin="anonymous"/>
                     <style type="text/css" dangerouslySetInnerHTML={{__html: this.props.styleTags}} />
                 </Head>
                 <body>

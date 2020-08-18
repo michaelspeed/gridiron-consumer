@@ -59,9 +59,6 @@ const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
                     </React.Fragment>}
                 </div>
             </Drawer>
-            <Modal >
-
-            </Modal>
         </React.Fragment>
     )
 }

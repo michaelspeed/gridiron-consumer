@@ -14,6 +14,7 @@ import {assetsURL} from "../../utils/globalconstants";
 import clsx from "clsx";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
+import {primary} from "../../utils/colorConfig";
 
 interface Props {
     menu: any,
@@ -49,7 +50,7 @@ const SingleProduct = ({menu, variant, store}: Props) => {
             }
         } else {
             return {
-                back: '#000000',
+                back: primary,
                 color: '#FFFFFF'
             }
         }
@@ -104,8 +105,6 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                                         <span>242 orders</span>
                                     </div>
                                 </div>
-                                <p>Seamlessly predominate enterprise metrics without performance based process
-                                    improvements.</p>
                                 <div className="pro-details-price">
                                     <span>US $75.72</span>
                                     <span className="old-price">US $95.72</span>
@@ -136,22 +135,12 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                                 </div>
                                 <div className="pro-details-action-wrap">
                                     <div className="pro-details-buy-now">
-                                        <a href="#">Buy Now</a>
+                                        <a href="javascript:;" style={{backgroundColor: primary, textDecoration: "none"}}>Buy Now</a>
                                     </div>
                                     <div className="pro-details-action">
-                                        <a title="Add to Cart" href="#"><i className="icon-basket"></i></a>
-                                        <a title="Add to Wishlist" href="#"><i className="icon-heart"></i></a>
-                                        <a className="social" title="Social" href="#"><i className="icon-share"></i></a>
-                                        <div className="product-dec-social">
-                                            <a className="facebook" title="Facebook" href="#"><i
-                                                className="icon-social-facebook-square"></i></a>
-                                            <a className="twitter" title="Twitter" href="#"><i
-                                                className="icon-social-twitter"></i></a>
-                                            <a className="instagram" title="Instagram" href="#"><i
-                                                className="icon-social-instagram"></i></a>
-                                            <a className="pinterest" title="Pinterest" href="#"><i
-                                                className="icon-social-pinterest"></i></a>
-                                        </div>
+                                        <a className="social" title="Social" href="javascript:;">
+                                            <i className="fas fa-share"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -173,40 +162,23 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                                     <div className="description-wrap" dangerouslySetInnerHTML={{__html: variant.product.description}}></div>
                                 </div>
                                 <div id="des-details2" className="tab-pane">
-                                    <div className="specification-wrap table-responsive">
-                                        <table>
-                                            <tbody>
-                                            <tr>
-                                                <td className="width1">Name</td>
-                                                <td>Salwar Kameez</td>
-                                            </tr>
-                                            <tr>
-                                                <td>SKU</td>
-                                                <td>0x48e2c</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="width1">Models</td>
-                                                <td>FX 829 v1</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="width1">Categories</td>
-                                                <td>Digital Print</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="width1">Size</td>
-                                                <td>60’’ x 40’’</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="width1">Brand</td>
-                                                <td>Individual Collections</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="width1">Color</td>
-                                                <td>Black, White</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    {variant.specs && variant.specs.specs.map(spec => (
+                                        <div className="specification-wrap table-responsive">
+                                            <div>
+                                                <h4>{spec.header}</h4>
+                                            </div>
+                                            <table>
+                                                <tbody>
+                                                {spec.child.map(spechild => (
+                                                    <tr>
+                                                        <td className="width1">{spechild.key}</td>
+                                                        <td>{spechild.value}</td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ))}
                                 </div>
                                 <div id="des-details3" className="tab-pane">
                                     <div className="review-wrapper">
@@ -304,7 +276,7 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                     </div>
                 </div>
             </div>
-            <div className="product-area pb-155">
+            {/*<div className="product-area pb-155">
                 <div className="container">
                     <div className="section-title-8 mb-65">
                         <h2>You May Like Also</h2>
@@ -482,7 +454,7 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>*/}
         </Layout>
     )
 }

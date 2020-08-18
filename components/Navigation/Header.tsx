@@ -10,6 +10,7 @@ import {GridIronConstants} from "../../utils/globalconstants";
 import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
 import { UserOutlined } from '@ant-design/icons';
+import {getCollectionRoute, getFacetRoute} from "../../utils/routingUtils";
 
 interface Props {
     menu: string,
@@ -22,7 +23,7 @@ const Header = observer(({menu, store}: Props) => {
 
     const [menuTree, setMenuTree] = useState<any[]>([])
 
-    const {setStoreLogin, user} = useStore(null)
+    const {setStoreLogin, user, setStoreLogout} = useStore(null)
 
     const {...coltree} = useQuery(GetCollectionTreeDocument)
 
@@ -37,9 +38,12 @@ const Header = observer(({menu, store}: Props) => {
     const [rpass, setRPass] = useState('')
     const [rphone, setRPhone] = useState('')
 
+    const [search, setSearch] = useState('')
+
     const navig = useRouter()
 
     const {...currUser} = useQuery(GetCurrentUserDocument, {pollInterval: 3000})
+
 
     useEffect(() => {
         if (currUser.data) {
@@ -63,7 +67,20 @@ const Header = observer(({menu, store}: Props) => {
 
     useEffect(() => {
         setMenuTree(JSON.parse(menu))
+        console.log(JSON.parse(menu))
     }, [menu])
+
+    const ClickMenuItem = (item) => {
+        if (item.target === 'COLLECTION') {
+            navig.push(getCollectionRoute(item.targetId))
+        }
+    }
+
+    const ClickFacetItem = (item, parent) => {
+        if (parent.target === 'COLLECTION') {
+            navig.push(getFacetRoute(item.targetId, parent.targetId))
+        }
+    }
 
     return (
         <React.Fragment>
@@ -106,17 +123,17 @@ const Header = observer(({menu, store}: Props) => {
                                                 <ul>
                                                     {menuTree.map((item: any) => (
                                                         <li>
-                                                            <a href="index.html">{item.title}</a>
+                                                            <a href="javascript:;" onClick={() => ClickMenuItem(item)}>{item.title}</a>
                                                             <ul className="mega-menu-style-1 mega-menu-width1 menu-negative-mrg1" style={{backgroundColor: primary}}>
                                                                 {item.children !== undefined && item.children.length > 0
                                                                 && item.children.map((child) => {
                                                                     return (
                                                                         <li className="">
-                                                                            <a className="menu-title" href="#">{child.title}</a>
+                                                                            <a className="menu-title" href="javascript:;" onClick={() => ClickFacetItem(child, item)}>{child.title}</a>
                                                                             <ul>
                                                                                 {child.children !== undefined && child.children.length > 0
                                                                                 && child.children.map((lilMenu) => (
-                                                                                    <li><a href="index.html">{lilMenu.title}</a></li>
+                                                                                    <li><a href="javascript:;" onClick={() => ClickFacetItem(lilMenu, child)}>{lilMenu.title}</a></li>
                                                                                 ))}
                                                                             </ul>
                                                                         </li>
@@ -178,7 +195,7 @@ const Header = observer(({menu, store}: Props) => {
                                         <div className="search-style-2 mr-20">
                                             <form>
                                                 <div className="form-search-2">
-                                                    <input className="input-text" value=""
+                                                    <input className="input-text" value={search} onChange={event => setSearch(event.target.value)}
                                                            placeholder="Type to search (Ex: Phone, Laptop)"
                                                            type="search"/>
                                                     <button>
@@ -195,7 +212,7 @@ const Header = observer(({menu, store}: Props) => {
                                             <Dropdown overlay={() => (
                                                 <Menu>
                                                     <Menu.Item>
-                                                        <a href="javascript:;">
+                                                        <a href="javascript:;" onClick={() => navig.push('/accounts?q=order')}>
                                                             Order
                                                         </a>
                                                     </Menu.Item>
@@ -205,11 +222,11 @@ const Header = observer(({menu, store}: Props) => {
                                                         </a>
                                                     </Menu.Item>
                                                     <Menu.Item>
-                                                        <a href="javascript:;">
+                                                        <a href="javascript:;" onClick={() => navig.push('/accounts?q=address')}>
                                                             My Addresses
                                                         </a>
                                                     </Menu.Item>
-                                                    <Menu.Item danger>
+                                                    <Menu.Item danger onClick={() => setStoreLogout()}>
                                                         Logout
                                                     </Menu.Item>
                                                 </Menu>
@@ -320,8 +337,14 @@ const Header = observer(({menu, store}: Props) => {
                                         .then(value => {
                                             setLoading(false)
                                             setLogin(false)
-                                            console.log(value)
-                                            localStorage.setItem(GridIronConstants, value.data.LoginUser.token)
+                                            setStoreLogin({
+                                                id: value.data.LoginUser.user.id,
+                                                email: value.data.LoginUser.user.email,
+                                                phone: value.data.LoginUser.user.phoneNumber,
+                                                verified: value.data.LoginUser.user.verified,
+                                                firstName: value.data.LoginUser.user.firstName,
+                                                lastName: value.data.LoginUser.user.lastName
+                                            })
                                         })
                                         .catch(error => {
                                             setLoading(false)

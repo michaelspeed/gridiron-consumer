@@ -18,9 +18,7 @@ interface Props {
     query: string
 }
 
-const AccountPage = ({menu, main, list, store, query}: Props) => {
-
-    console.log(query)
+const AccountPage = ({menu, store, query}: Props) => {
 
     useScripts('/js/main.js')
     const {user} = useStore(null)

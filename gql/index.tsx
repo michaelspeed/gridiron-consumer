@@ -224,7 +224,7 @@ export type ProductVariant = {
   trackInventory: Scalars['Boolean'];
   asset: ProductVariantAsset;
   price?: Maybe<Array<ProductVariantPrice>>;
-  specs: ProductVariantSpecs;
+  specs?: Maybe<ProductVariantSpecs>;
   seo?: Maybe<Seo>;
   stock: Array<StockKeeping>;
 };
@@ -2725,12 +2725,14 @@ export type Query = {
   GetProductVariantForCollection: Array<ProductVariant>;
   getHomePage: Page;
   getSingleProductVariant: ProductVariant;
+  singProductInfo: Product;
   getProductVariantByProduct: Array<ProductVariant>;
   getProductAsset: Asset;
   GetDefaultStore: Store;
   GetCurrentUser: User;
   GetUserAddress: Array<Address>;
   GetAllSearch: Array<Search>;
+  queryFacet: Array<Product>;
 };
 
 
@@ -2756,6 +2758,11 @@ export type QueryGetSingleProductVariantArgs = {
 };
 
 
+export type QuerySingProductInfoArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryGetProductVariantByProductArgs = {
   id: Scalars['ID'];
 };
@@ -2764,6 +2771,12 @@ export type QueryGetProductVariantByProductArgs = {
 export type QueryGetProductAssetArgs = {
   prodId?: Maybe<Scalars['ID']>;
   variantId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryQueryFacetArgs = {
+  collection?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -2841,7 +2854,7 @@ export type LoginUserMutation = (
     & Pick<UserResponse, 'token'>
     & { user: (
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'email' | 'phoneNumber'>
+      & Pick<User, 'id' | 'email' | 'verified' | 'verificationToken' | 'lastLogin' | 'firstName' | 'lastName' | 'phoneNumber'>
     ) }
   ) }
 );
@@ -2924,7 +2937,10 @@ export type GetSingleProductVariantQuery = (
   & { getSingleProductVariant: (
     { __typename?: 'ProductVariant' }
     & Pick<ProductVariant, 'id' | 'name'>
-    & { product: (
+    & { specs?: Maybe<(
+      { __typename?: 'ProductVariantSpecs' }
+      & Pick<ProductVariantSpecs, 'id' | 'specs'>
+    )>, product: (
       { __typename?: 'Product' }
       & Pick<Product, 'id' | 'productName' | 'slug' | 'description'>
       & { options: Array<(
@@ -3155,6 +3171,40 @@ export type GetProductVariantByProductQuery = (
   )> }
 );
 
+export type QueryFacetQueryVariables = Exact<{
+  id: Scalars['ID'];
+  collection?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type QueryFacetQuery = (
+  { __typename?: 'Query' }
+  & { queryFacet: Array<(
+    { __typename?: 'Product' }
+    & Pick<Product, 'id' | 'productName' | 'slug'>
+    & { collection?: Maybe<(
+      { __typename?: 'Collection' }
+      & Pick<Collection, 'id' | 'name'>
+    )>, featuredAsset: (
+      { __typename?: 'Asset' }
+      & Pick<Asset, 'id' | 'preview' | 'source'>
+    ) }
+  )> }
+);
+
+export type SingProductInfoQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type SingProductInfoQuery = (
+  { __typename?: 'Query' }
+  & { singProductInfo: (
+    { __typename?: 'Product' }
+    & Pick<Product, 'id' | 'productName'>
+  ) }
+);
+
 
 export const LoginUserDocument = gql`
     mutation LoginUser($email: String!, $password: String!) {
@@ -3162,6 +3212,11 @@ export const LoginUserDocument = gql`
     user {
       id
       email
+      verified
+      verificationToken
+      lastLogin
+      firstName
+      lastName
       phoneNumber
     }
     token
@@ -3375,6 +3430,10 @@ export const GetSingleProductVariantDocument = gql`
   getSingleProductVariant(id: $id) {
     id
     name
+    specs {
+      id
+      specs
+    }
     product {
       id
       productName
@@ -3869,3 +3928,82 @@ export function useGetProductVariantByProductLazyQuery(baseOptions?: Apollo.Lazy
 export type GetProductVariantByProductQueryHookResult = ReturnType<typeof useGetProductVariantByProductQuery>;
 export type GetProductVariantByProductLazyQueryHookResult = ReturnType<typeof useGetProductVariantByProductLazyQuery>;
 export type GetProductVariantByProductQueryResult = Apollo.QueryResult<GetProductVariantByProductQuery, GetProductVariantByProductQueryVariables>;
+export const QueryFacetDocument = gql`
+    query QueryFacet($id: ID!, $collection: ID) {
+  queryFacet(id: $id, collection: $collection) {
+    id
+    productName
+    slug
+    collection {
+      id
+      name
+    }
+    featuredAsset {
+      id
+      preview
+      source
+    }
+  }
+}
+    `;
+
+/**
+ * __useQueryFacetQuery__
+ *
+ * To run a query within a React component, call `useQueryFacetQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQueryFacetQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQueryFacetQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      collection: // value for 'collection'
+ *   },
+ * });
+ */
+export function useQueryFacetQuery(baseOptions?: Apollo.QueryHookOptions<QueryFacetQuery, QueryFacetQueryVariables>) {
+        return Apollo.useQuery<QueryFacetQuery, QueryFacetQueryVariables>(QueryFacetDocument, baseOptions);
+      }
+export function useQueryFacetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QueryFacetQuery, QueryFacetQueryVariables>) {
+          return Apollo.useLazyQuery<QueryFacetQuery, QueryFacetQueryVariables>(QueryFacetDocument, baseOptions);
+        }
+export type QueryFacetQueryHookResult = ReturnType<typeof useQueryFacetQuery>;
+export type QueryFacetLazyQueryHookResult = ReturnType<typeof useQueryFacetLazyQuery>;
+export type QueryFacetQueryResult = Apollo.QueryResult<QueryFacetQuery, QueryFacetQueryVariables>;
+export const SingProductInfoDocument = gql`
+    query singProductInfo($id: ID!) {
+  singProductInfo(id: $id) {
+    id
+    productName
+  }
+}
+    `;
+
+/**
+ * __useSingProductInfoQuery__
+ *
+ * To run a query within a React component, call `useSingProductInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSingProductInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSingProductInfoQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSingProductInfoQuery(baseOptions?: Apollo.QueryHookOptions<SingProductInfoQuery, SingProductInfoQueryVariables>) {
+        return Apollo.useQuery<SingProductInfoQuery, SingProductInfoQueryVariables>(SingProductInfoDocument, baseOptions);
+      }
+export function useSingProductInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SingProductInfoQuery, SingProductInfoQueryVariables>) {
+          return Apollo.useLazyQuery<SingProductInfoQuery, SingProductInfoQueryVariables>(SingProductInfoDocument, baseOptions);
+        }
+export type SingProductInfoQueryHookResult = ReturnType<typeof useSingProductInfoQuery>;
+export type SingProductInfoLazyQueryHookResult = ReturnType<typeof useSingProductInfoLazyQuery>;
+export type SingProductInfoQueryResult = Apollo.QueryResult<SingProductInfoQuery, SingProductInfoQueryVariables>;

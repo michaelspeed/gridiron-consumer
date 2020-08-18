@@ -8,6 +8,9 @@ import {useRouter} from "next/router";
 import HomePageListItem from "../components/Home/HomePageListItem";
 import {initializeStore} from "../store/store";
 import {getSnapshot} from "mobx-state-tree";
+import React from "react";
+import Slider from "react-slick";
+import {getProdRoute} from "../utils/routingUtils";
 
 interface Props {
   menu: any,
@@ -23,9 +26,44 @@ const IndexPage = ({menu, main, list, store}: Props) => {
 
   const onClickCarousel = (item) => {
     if (item.type === 'variant') {
-      navig.push(`/product/${item.target.id}`)
+      navig.push(getProdRoute(item.target.id))
     }
   }
+
+  const carusSett = {
+    dots: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 4,
+    initialSlide: 0,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          initialSlide: 2
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
+  };
 
   return (
       <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
@@ -63,11 +101,16 @@ const IndexPage = ({menu, main, list, store}: Props) => {
                 <div className="section-title-8 mb-65">
                   <h2>{listitem.name}</h2>
                 </div>
-                <div className="product-slider-active-4">
-                  {listitem.items.map(listsub => (
-                      <HomePageListItem item={listsub}/>
-                  ))}
+                <div >
+                  <Slider {...carusSett}>
+                    {listitem.items.map((listsub, index) => (
+                        <HomePageListItem item={listsub} key={index}/>
+                    ))}
+                  </Slider>
                 </div>
+                {/*<div className="product-slider-active-4" style={{width: '100%'}}>
+
+                </div>*/}
               </div>
             </div>
         ))}

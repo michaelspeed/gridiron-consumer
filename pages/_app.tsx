@@ -6,6 +6,15 @@ import '../styles/style.css'
 import {ThemeProvider} from "@material-ui/styles";
 import theme from "../theme/theme";
 import {CssBaseline} from "@material-ui/core";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
+import Router from "next/router";
+
+Router.events.on('routeChangeStart', () => NProgress.start());
+Router.events.on('routeChangeComplete', () => NProgress.done());
+Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp({Component, pageProps}) {
 

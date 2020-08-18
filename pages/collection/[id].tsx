@@ -16,6 +16,8 @@ import { LoadingOutlined } from '@ant-design/icons';
 import {primary} from "../../utils/colorConfig";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
+import {useRouter} from "next/router";
+import {getProdRoute} from "../../utils/routingUtils";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -33,6 +35,8 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
     const [page, setPage] = useState(1)
     const [products, setProducts] = useState<ProductVariant[]>([])
     const [search, setSearch] = useState('')
+
+    const navig = useRouter()
 
     const {...facetCol} = useQuery(GetFacetsByCollectionDocument, {
         variables: {
@@ -123,14 +127,14 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                         <div className="row">
                                             {products.map(variant => (
                                                 <div className="col-lg-4 col-md-6 col-sm-6 col-12">
-                                                    <div className="product-wrap mb-50">
+                                                    <div className="product-wrap mb-50" style={{height: 300}}>
                                                         <div className="product-img product-img-zoom mb-25">
-                                                            <a href="product-details.html">
-                                                                <img src={`${assetsURL}/${variant.asset.asset.preview}`}  alt="" style={{height: 360, objectFit: "contain"}}/>
+                                                            <a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>
+                                                                <img src={`${assetsURL}/${variant.asset.asset.preview}`}  alt="" style={{height: 150, objectFit: "contain"}}/>
                                                             </a>
                                                         </div>
                                                         <div className="product-content">
-                                                            <h4><a href="product-details.html">{variant.name}</a></h4>
+                                                            <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                                             <div className="product-price">
                                                                 <span>$ 124</span>
                                                                 <span className="old-price">$ 130</span>
@@ -138,7 +142,7 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                                         </div>
                                                         <div className="product-action-position-1 text-center">
                                                             <div className="product-content">
-                                                                <h4><a href="product-details.html">{variant.name}</a></h4>
+                                                                <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                                                 <div className="product-price">
                                                                     <span>$ 124</span>
                                                                     <span className="old-price">$ 130</span>

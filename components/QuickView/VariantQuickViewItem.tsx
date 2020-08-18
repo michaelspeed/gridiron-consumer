@@ -1,7 +1,9 @@
 import {assetsURL} from "../../utils/globalconstants";
 import React from "react";
 import {ProductVariant} from "../../gql";
-import {Chip} from "@material-ui/core";
+import {primary} from "../../utils/colorConfig";
+import {useRouter} from "next/router";
+import {getProdRoute} from "../../utils/routingUtils";
 
 interface Props {
     item: ProductVariant
@@ -19,18 +21,20 @@ const VariantQuickViewItem = ({item}: Props) => {
         return master
     }
 
+    const navig = useRouter()
+
     return (
         <div className="row mt-5 mb-5" key={item.id}>
             <div className="col-lg-4 col-md-4 col-sm-4">
                 <div className="product-list-img" style={{padding: 10}}>
-                    <a href="product-details.html">
+                    <a href="javascript:;" onClick={() => navig.push(getProdRoute(item.id))}>
                         <img src={`${assetsURL}/${item.asset.asset.preview}`}  alt="" style={{height: 150, objectFit: "contain"}}/>
                     </a>
                 </div>
             </div>
             <div className="col-lg-8 col-md-8 col-sm-8">
                 <div className="shop-list-content ml-20">
-                    <h3><a href="#">{item.name}</a></h3>
+                    <h3><a href="javascript:;" style={{textDecoration: "none"}} onClick={() => navig.push(getProdRoute(item.id))}>{item.name}</a></h3>
                     {item.price!.length === 0}
                     {item.price!.map(price => (
                         <div className="pro-list-price">
@@ -48,7 +52,7 @@ const VariantQuickViewItem = ({item}: Props) => {
                     </p>
                     <div className="product-list-action">
                         <div className="product-action-cart">
-                            <button title="Add to Cart">Add to cart</button>
+                            <button title="Add to Cart" style={{backgroundColor: primary}}>Add to cart</button>
                         </div>
                     </div>
                 </div>

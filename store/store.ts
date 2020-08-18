@@ -1,5 +1,6 @@
 import {Instance, types, SnapshotIn, SnapshotOut, applySnapshot} from "mobx-state-tree";
 import {useMemo} from "react";
+import {GridIronConstants} from "../utils/globalconstants";
 
 let store: IStore | undefined
 
@@ -24,8 +25,17 @@ const Store = types
         quickview: types.boolean,
         qtype: types.maybeNull(IQType)
     }).actions(self => {
-        const setStoreLogin = (user) => {
+        const setStoreLogin = (user, token?) => {
             self.user = user
+            if (token) {
+                self.token = token
+                localStorage.setItem(GridIronConstants, token)
+            }
+        }
+        const setStoreLogout = () => {
+            self.user = null
+            self.token = null
+            localStorage.removeItem(GridIronConstants)
         }
         const setQuickView = () => {
             self.quickview = !self.quickview
@@ -36,7 +46,7 @@ const Store = types
         const setQuickViewNull = () => {
             self.qtype = null
         }
-        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull}
+        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout}
     })
 
 export type IStore = Instance<typeof Store>

@@ -26,6 +26,10 @@ query getSingleProductVariant($id: ID!){
     getSingleProductVariant(id: $id){
         id
         name
+        specs {
+            id
+            specs
+        }
         product {
             id
             productName
@@ -249,5 +253,29 @@ query getProductVariantByProduct($id: ID!){
             metadesc
             metakeywords
         }
+    }
+}
+
+query QueryFacet($id: ID!, $collection: ID){
+    queryFacet(id: $id, collection: $collection){
+        id
+        productName
+        slug
+        collection {
+            id
+            name
+        }
+        featuredAsset {
+            id
+            preview
+            source
+        }
+    }
+}
+
+query singProductInfo($id: ID!) {
+    singProductInfo(id: $id) {
+        id
+        productName
     }
 }
