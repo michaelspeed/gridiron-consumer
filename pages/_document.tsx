@@ -25,6 +25,7 @@ export default class MyDocument extends Document<any> {
             <Html lang='en'>
                 <Head>
                     <script src="/js/vendor/jquery-3.5.1.min.js"></script>
+                    <script src="/js/plugins/slick.js"></script>
                     <link rel="stylesheet" href="/css/vendor/bootstrap.min.css"/>
                     <link rel="stylesheet" href="/css/vendor/vandella.css"/>
                     <link rel="stylesheet" href="/css/vendor/jellybelly.css"/>

@@ -63,4 +63,4 @@ const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
     )
 }
 
-export default withApollo(observer(Layout))
+export default withApollo(observer(Layout)) as any
