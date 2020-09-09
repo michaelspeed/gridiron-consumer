@@ -15,8 +15,6 @@ export type Scalars = {
   JSONObject: any;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
-  /** Cursor for paging through collections */
-  ConnectionCursor: any;
 };
 
 export type Administrator = {
@@ -69,6 +67,7 @@ export type Collection = {
   products: Array<Product>;
   seo: Seo;
   agreements: Array<BillingAgreement>;
+  cartPrice: CartPriceRules;
 };
 
 export type Facet = {
@@ -90,6 +89,33 @@ export type FacetValue = {
   product: Array<Product>;
   facet: Facet;
 };
+
+export type Order = {
+  __typename?: 'Order';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  totalPrice: Scalars['Float'];
+  address: Scalars['String'];
+};
+
+export type OrderItem = {
+  __typename?: 'OrderItem';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  quantity: Scalars['Float'];
+};
+
+export type OrderLine = {
+  __typename?: 'OrderLine';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  priceField: Scalars['JSON'];
+  stage: Scalars['String'];
+};
+
 
 export type Product = {
   __typename?: 'Product';
@@ -122,12 +148,13 @@ export type User = {
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phoneNumber: Scalars['String'];
-  administrator: Administrator;
-  vendor: Vendor;
-  delivery: Delivery;
-  cart: Cart;
+  administrator?: Maybe<Administrator>;
+  vendor?: Maybe<Vendor>;
+  delivery?: Maybe<Delivery>;
+  cart?: Maybe<Cart>;
   view: Array<View>;
-  address: Array<Address>;
+  address?: Maybe<Array<Address>>;
+  order?: Maybe<Array<Order>>;
 };
 
 export type Vendor = {
@@ -138,6 +165,7 @@ export type Vendor = {
   vendorName: Scalars['String'];
   phoneNumber: Scalars['String'];
   email: Scalars['String'];
+  zip?: Maybe<Zip>;
 };
 
 export type TaxRate = {
@@ -166,6 +194,7 @@ export type Store = {
   rentalStore: Scalars['Boolean'];
   channelMarkets: Scalars['Boolean'];
   type: StoreTypeEnum;
+  vendor?: Maybe<Vendor>;
 };
 
 export enum StoreTypeEnum {
@@ -207,7 +236,6 @@ export type StockKeeping = {
   stockstatus: Scalars['Boolean'];
   sku: Scalars['String'];
   type: Scalars['String'];
-  variant: ProductVariant;
 };
 
 export type ProductVariant = {
@@ -226,7 +254,9 @@ export type ProductVariant = {
   price?: Maybe<Array<ProductVariantPrice>>;
   specs?: Maybe<ProductVariantSpecs>;
   seo?: Maybe<Seo>;
+  agreements: Array<BillingAgreement>;
   stock: Array<StockKeeping>;
+  line: Array<OrderItem>;
 };
 
 export type ProductVariantAsset = {
@@ -248,6 +278,7 @@ export type ProductVariantPrice = {
   tax: TaxRate;
   variant: ProductVariant;
   store?: Maybe<Store>;
+  promoprice?: Maybe<PromotionVariantPrice>;
 };
 
 export type ProductOption = {
@@ -278,6 +309,7 @@ export type BillingAgreement = {
   value: Scalars['Float'];
   type: BillingAgreementEnum;
   state: BillingAgreementState;
+  variant: ProductVariant;
   collection?: Maybe<Collection>;
   store: Store;
   request: Array<BillingAgreementRequest>;
@@ -286,7 +318,8 @@ export type BillingAgreement = {
 export enum BillingAgreementEnum {
   Planbase = 'PLANBASE',
   Collectionbase = 'COLLECTIONBASE',
-  Comissionbase = 'COMISSIONBASE'
+  Comissionbase = 'COMISSIONBASE',
+  Prodcommission = 'PRODCOMMISSION'
 }
 
 export enum BillingAgreementState {
@@ -303,7 +336,6 @@ export type ProductVariantSpecs = {
   specs: Scalars['JSON'];
   variant: ProductVariant;
 };
-
 
 export type Cart = {
   __typename?: 'Cart';
@@ -322,6 +354,16 @@ export type BillingAgreementRequest = {
   updatedAt: Scalars['DateTime'];
   value: Scalars['Float'];
   state: BillingAgreementState;
+};
+
+export type Zip = {
+  __typename?: 'Zip';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  name: Scalars['String'];
+  slug: Scalars['String'];
+  code: Scalars['Float'];
 };
 
 export type Page = {
@@ -355,6 +397,16 @@ export type Delivery = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   user: User;
+  signIn: Array<DeliverySignIn>;
+};
+
+export type DeliveryPool = {
+  __typename?: 'DeliveryPool';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  signIn: DeliverySignIn;
+  lines: Array<OrderLine>;
 };
 
 export type Search = {
@@ -364,6 +416,37 @@ export type Search = {
   updatedAt: Scalars['DateTime'];
   search: Scalars['String'];
   userId: Scalars['String'];
+};
+
+export type PromotionVariantPrice = {
+  __typename?: 'PromotionVariantPrice';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  priceType: Scalars['String'];
+  value: Scalars['Float'];
+  forever: Scalars['Boolean'];
+  startsAt: Scalars['DateTime'];
+  endsAt: Scalars['DateTime'];
+  enabled: Scalars['Boolean'];
+};
+
+export type CartPriceRules = {
+  __typename?: 'CartPriceRules';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  priceType: Scalars['String'];
+  value: Scalars['Float'];
+};
+
+export type DeliverySignIn = {
+  __typename?: 'DeliverySignIn';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  delivery: Delivery;
+  pool: DeliveryPool;
 };
 
 export type Address = {
@@ -382,7 +465,6 @@ export type Address = {
   defaultShippingAddress: Scalars['Boolean'];
   defaultBillingAddress: Scalars['Boolean'];
   addressType: AddressType;
-  user: User;
 };
 
 export enum AddressType {
@@ -756,6 +838,30 @@ export type StoreMaxAggregate = {
   GSTIN?: Maybe<Scalars['String']>;
 };
 
+export type StoreLinesCountAggregate = {
+  __typename?: 'StoreLinesCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  stage?: Maybe<Scalars['Int']>;
+};
+
+export type StoreLinesMinAggregate = {
+  __typename?: 'StoreLinesMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
+};
+
+export type StoreLinesMaxAggregate = {
+  __typename?: 'StoreLinesMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
+};
+
 export type StorePricesCountAggregate = {
   __typename?: 'StorePricesCountAggregate';
   id?: Maybe<Scalars['Int']>;
@@ -1104,6 +1210,93 @@ export type UserMaxAggregate = {
   phoneNumber?: Maybe<Scalars['String']>;
 };
 
+export type UserOrdersCountAggregate = {
+  __typename?: 'UserOrdersCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  totalPrice?: Maybe<Scalars['Int']>;
+  address?: Maybe<Scalars['Int']>;
+};
+
+export type UserOrdersSumAggregate = {
+  __typename?: 'UserOrdersSumAggregate';
+  totalPrice?: Maybe<Scalars['Float']>;
+};
+
+export type UserOrdersAvgAggregate = {
+  __typename?: 'UserOrdersAvgAggregate';
+  totalPrice?: Maybe<Scalars['Float']>;
+};
+
+export type UserOrdersMinAggregate = {
+  __typename?: 'UserOrdersMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  totalPrice?: Maybe<Scalars['Float']>;
+  address?: Maybe<Scalars['String']>;
+};
+
+export type UserOrdersMaxAggregate = {
+  __typename?: 'UserOrdersMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  totalPrice?: Maybe<Scalars['Float']>;
+  address?: Maybe<Scalars['String']>;
+};
+
+export type UserAddressesCountAggregate = {
+  __typename?: 'UserAddressesCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  fullName?: Maybe<Scalars['Int']>;
+  addressLine?: Maybe<Scalars['Int']>;
+  city?: Maybe<Scalars['Int']>;
+  state?: Maybe<Scalars['Int']>;
+  landmark?: Maybe<Scalars['Int']>;
+  postalCode?: Maybe<Scalars['Int']>;
+  phoneNumber?: Maybe<Scalars['Int']>;
+  alternatePhoneNumber?: Maybe<Scalars['Int']>;
+  defaultShippingAddress?: Maybe<Scalars['Int']>;
+  defaultBillingAddress?: Maybe<Scalars['Int']>;
+  addressType?: Maybe<Scalars['Int']>;
+};
+
+export type UserAddressesMinAggregate = {
+  __typename?: 'UserAddressesMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  fullName?: Maybe<Scalars['String']>;
+  addressLine?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  landmark?: Maybe<Scalars['String']>;
+  postalCode?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  alternatePhoneNumber?: Maybe<Scalars['String']>;
+  addressType?: Maybe<AddressType>;
+};
+
+export type UserAddressesMaxAggregate = {
+  __typename?: 'UserAddressesMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  fullName?: Maybe<Scalars['String']>;
+  addressLine?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  landmark?: Maybe<Scalars['String']>;
+  postalCode?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  alternatePhoneNumber?: Maybe<Scalars['String']>;
+  addressType?: Maybe<AddressType>;
+};
+
 export type VendorCountAggregate = {
   __typename?: 'VendorCountAggregate';
   id?: Maybe<Scalars['Int']>;
@@ -1132,6 +1325,46 @@ export type VendorMaxAggregate = {
   vendorName?: Maybe<Scalars['String']>;
   phoneNumber?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
+};
+
+export type VendorZipsCountAggregate = {
+  __typename?: 'VendorZipsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['Int']>;
+  slug?: Maybe<Scalars['Int']>;
+  code?: Maybe<Scalars['Int']>;
+};
+
+export type VendorZipsSumAggregate = {
+  __typename?: 'VendorZipsSumAggregate';
+  code?: Maybe<Scalars['Float']>;
+};
+
+export type VendorZipsAvgAggregate = {
+  __typename?: 'VendorZipsAvgAggregate';
+  code?: Maybe<Scalars['Float']>;
+};
+
+export type VendorZipsMinAggregate = {
+  __typename?: 'VendorZipsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  code?: Maybe<Scalars['Float']>;
+};
+
+export type VendorZipsMaxAggregate = {
+  __typename?: 'VendorZipsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  code?: Maybe<Scalars['Float']>;
 };
 
 export type ZoneCountAggregate = {
@@ -1724,6 +1957,40 @@ export type ProductVariantMaxAggregate = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type ProductVariantLinesCountAggregate = {
+  __typename?: 'ProductVariantLinesCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int']>;
+};
+
+export type ProductVariantLinesSumAggregate = {
+  __typename?: 'ProductVariantLinesSumAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantLinesAvgAggregate = {
+  __typename?: 'ProductVariantLinesAvgAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantLinesMinAggregate = {
+  __typename?: 'ProductVariantLinesMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantLinesMaxAggregate = {
+  __typename?: 'ProductVariantLinesMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
 export type ProductVariantStocksCountAggregate = {
   __typename?: 'ProductVariantStocksCountAggregate';
   id?: Maybe<Scalars['Int']>;
@@ -1775,6 +2042,40 @@ export type ProductVariantStocksMaxAggregate = {
   threshold?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+};
+
+export type ProductVariantAgreementsCountAggregate = {
+  __typename?: 'ProductVariantAgreementsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  value?: Maybe<Scalars['Int']>;
+};
+
+export type ProductVariantAgreementsSumAggregate = {
+  __typename?: 'ProductVariantAgreementsSumAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantAgreementsAvgAggregate = {
+  __typename?: 'ProductVariantAgreementsAvgAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantAgreementsMinAggregate = {
+  __typename?: 'ProductVariantAgreementsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantAgreementsMaxAggregate = {
+  __typename?: 'ProductVariantAgreementsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  value?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantPricesCountAggregate = {
@@ -2362,7 +2663,6 @@ export type OrderCountAggregate = {
   id?: Maybe<Scalars['Int']>;
   createdAt?: Maybe<Scalars['Int']>;
   updatedAt?: Maybe<Scalars['Int']>;
-  orderPlacedAt?: Maybe<Scalars['Int']>;
   totalPrice?: Maybe<Scalars['Int']>;
   address?: Maybe<Scalars['Int']>;
 };
@@ -2382,7 +2682,6 @@ export type OrderMinAggregate = {
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  orderPlacedAt?: Maybe<Scalars['DateTime']>;
   totalPrice?: Maybe<Scalars['Float']>;
   address?: Maybe<Scalars['String']>;
 };
@@ -2392,9 +2691,32 @@ export type OrderMaxAggregate = {
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  orderPlacedAt?: Maybe<Scalars['DateTime']>;
   totalPrice?: Maybe<Scalars['Float']>;
   address?: Maybe<Scalars['String']>;
+};
+
+export type OrderLinesCountAggregate = {
+  __typename?: 'OrderLinesCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  stage?: Maybe<Scalars['Int']>;
+};
+
+export type OrderLinesMinAggregate = {
+  __typename?: 'OrderLinesMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
+};
+
+export type OrderLinesMaxAggregate = {
+  __typename?: 'OrderLinesMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
 };
 
 export type ZipCountAggregate = {
@@ -2435,6 +2757,36 @@ export type ZipMaxAggregate = {
   name?: Maybe<Scalars['String']>;
   slug?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['Float']>;
+};
+
+export type ZipVendorsCountAggregate = {
+  __typename?: 'ZipVendorsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  vendorName?: Maybe<Scalars['Int']>;
+  phoneNumber?: Maybe<Scalars['Int']>;
+  email?: Maybe<Scalars['Int']>;
+};
+
+export type ZipVendorsMinAggregate = {
+  __typename?: 'ZipVendorsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  vendorName?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+};
+
+export type ZipVendorsMaxAggregate = {
+  __typename?: 'ZipVendorsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  vendorName?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
 };
 
 export type MenuCountAggregate = {
@@ -2580,76 +2932,6 @@ export type AddressMaxAggregate = {
   addressType?: Maybe<AddressType>;
 };
 
-export type UserEdge = {
-  __typename?: 'UserEdge';
-  /** The node containing the User */
-  node: User;
-  /** Cursor for this node. */
-  cursor: Scalars['ConnectionCursor'];
-};
-
-
-export type PageInfo = {
-  __typename?: 'PageInfo';
-  /** true if paging forward and there are more records. */
-  hasNextPage?: Maybe<Scalars['Boolean']>;
-  /** true if paging backwards and there are more records. */
-  hasPreviousPage?: Maybe<Scalars['Boolean']>;
-  /** The cursor of the first returned record. */
-  startCursor?: Maybe<Scalars['ConnectionCursor']>;
-  /** The cursor of the last returned record. */
-  endCursor?: Maybe<Scalars['ConnectionCursor']>;
-};
-
-export type AddressUsersCountAggregate = {
-  __typename?: 'AddressUsersCountAggregate';
-  id?: Maybe<Scalars['Int']>;
-  createdAt?: Maybe<Scalars['Int']>;
-  updatedAt?: Maybe<Scalars['Int']>;
-  email?: Maybe<Scalars['Int']>;
-  verified?: Maybe<Scalars['Int']>;
-  verificationToken?: Maybe<Scalars['Int']>;
-  passwordResetToken?: Maybe<Scalars['Int']>;
-  identifierChangeToken?: Maybe<Scalars['Int']>;
-  pendingIdentifier?: Maybe<Scalars['Int']>;
-  lastLogin?: Maybe<Scalars['Int']>;
-  firstName?: Maybe<Scalars['Int']>;
-  lastName?: Maybe<Scalars['Int']>;
-  phoneNumber?: Maybe<Scalars['Int']>;
-};
-
-export type AddressUsersMinAggregate = {
-  __typename?: 'AddressUsersMinAggregate';
-  id?: Maybe<Scalars['ID']>;
-  createdAt?: Maybe<Scalars['DateTime']>;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  email?: Maybe<Scalars['String']>;
-  verificationToken?: Maybe<Scalars['String']>;
-  passwordResetToken?: Maybe<Scalars['String']>;
-  identifierChangeToken?: Maybe<Scalars['String']>;
-  pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['DateTime']>;
-  firstName?: Maybe<Scalars['String']>;
-  lastName?: Maybe<Scalars['String']>;
-  phoneNumber?: Maybe<Scalars['String']>;
-};
-
-export type AddressUsersMaxAggregate = {
-  __typename?: 'AddressUsersMaxAggregate';
-  id?: Maybe<Scalars['ID']>;
-  createdAt?: Maybe<Scalars['DateTime']>;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  email?: Maybe<Scalars['String']>;
-  verificationToken?: Maybe<Scalars['String']>;
-  passwordResetToken?: Maybe<Scalars['String']>;
-  identifierChangeToken?: Maybe<Scalars['String']>;
-  pendingIdentifier?: Maybe<Scalars['String']>;
-  lastLogin?: Maybe<Scalars['DateTime']>;
-  firstName?: Maybe<Scalars['String']>;
-  lastName?: Maybe<Scalars['String']>;
-  phoneNumber?: Maybe<Scalars['String']>;
-};
-
 export type SettlementsCountAggregate = {
   __typename?: 'SettlementsCountAggregate';
   id?: Maybe<Scalars['Int']>;
@@ -2709,10 +2991,219 @@ export type CollectionSingleResponse = {
   facetValues: Array<FacetValue>;
 };
 
+export type StockZip = {
+  __typename?: 'StockZip';
+  stock: Scalars['Boolean'];
+  zip: Scalars['Boolean'];
+};
+
 export type UserResponse = {
   __typename?: 'UserResponse';
   user: User;
   token: Scalars['String'];
+};
+
+export type OrderLineCountAggregate = {
+  __typename?: 'OrderLineCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  stage?: Maybe<Scalars['Int']>;
+};
+
+export type OrderLineMinAggregate = {
+  __typename?: 'OrderLineMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
+};
+
+export type OrderLineMaxAggregate = {
+  __typename?: 'OrderLineMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  stage?: Maybe<Scalars['String']>;
+};
+
+export type OrderItemCountAggregate = {
+  __typename?: 'OrderItemCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int']>;
+};
+
+export type OrderItemSumAggregate = {
+  __typename?: 'OrderItemSumAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type OrderItemAvgAggregate = {
+  __typename?: 'OrderItemAvgAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type OrderItemMinAggregate = {
+  __typename?: 'OrderItemMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type OrderItemMaxAggregate = {
+  __typename?: 'OrderItemMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type PromotionVariantPriceCountAggregate = {
+  __typename?: 'PromotionVariantPriceCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  priceType?: Maybe<Scalars['Int']>;
+  value?: Maybe<Scalars['Int']>;
+  forever?: Maybe<Scalars['Int']>;
+  startsAt?: Maybe<Scalars['Int']>;
+  endsAt?: Maybe<Scalars['Int']>;
+  enabled?: Maybe<Scalars['Int']>;
+};
+
+export type PromotionVariantPriceSumAggregate = {
+  __typename?: 'PromotionVariantPriceSumAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type PromotionVariantPriceAvgAggregate = {
+  __typename?: 'PromotionVariantPriceAvgAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type PromotionVariantPriceMinAggregate = {
+  __typename?: 'PromotionVariantPriceMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  priceType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Float']>;
+  startsAt?: Maybe<Scalars['DateTime']>;
+  endsAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type PromotionVariantPriceMaxAggregate = {
+  __typename?: 'PromotionVariantPriceMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  priceType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Float']>;
+  startsAt?: Maybe<Scalars['DateTime']>;
+  endsAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type CartPriceRulesCountAggregate = {
+  __typename?: 'CartPriceRulesCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  priceType?: Maybe<Scalars['Int']>;
+  value?: Maybe<Scalars['Int']>;
+};
+
+export type CartPriceRulesSumAggregate = {
+  __typename?: 'CartPriceRulesSumAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type CartPriceRulesAvgAggregate = {
+  __typename?: 'CartPriceRulesAvgAggregate';
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type CartPriceRulesMinAggregate = {
+  __typename?: 'CartPriceRulesMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  priceType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type CartPriceRulesMaxAggregate = {
+  __typename?: 'CartPriceRulesMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  priceType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Float']>;
+};
+
+export type AccountCountAggregate = {
+  __typename?: 'AccountCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+};
+
+export type AccountMinAggregate = {
+  __typename?: 'AccountMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type AccountMaxAggregate = {
+  __typename?: 'AccountMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type DeliveryCountAggregate = {
+  __typename?: 'DeliveryCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+};
+
+export type DeliveryMinAggregate = {
+  __typename?: 'DeliveryMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type DeliveryMaxAggregate = {
+  __typename?: 'DeliveryMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type DeliverySignInsCountAggregate = {
+  __typename?: 'DeliverySignInsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+};
+
+export type DeliverySignInsMinAggregate = {
+  __typename?: 'DeliverySignInsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type DeliverySignInsMaxAggregate = {
+  __typename?: 'DeliverySignInsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type Query = {
@@ -2726,6 +3217,8 @@ export type Query = {
   getHomePage: Page;
   getSingleProductVariant: ProductVariant;
   singProductInfo: Product;
+  singProductPrice: ProductVariant;
+  GetStocksAndZipAvailability: StockZip;
   getProductVariantByProduct: Array<ProductVariant>;
   getProductAsset: Asset;
   GetDefaultStore: Store;
@@ -2760,6 +3253,18 @@ export type QueryGetSingleProductVariantArgs = {
 
 export type QuerySingProductInfoArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QuerySingProductPriceArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetStocksAndZipAvailabilityArgs = {
+  zipf: Scalars['Int'];
+  variantId: Scalars['ID'];
+  storeId: Scalars['ID'];
 };
 
 
@@ -3202,6 +3707,49 @@ export type SingProductInfoQuery = (
   & { singProductInfo: (
     { __typename?: 'Product' }
     & Pick<Product, 'id' | 'productName'>
+  ) }
+);
+
+export type SingProductPriceQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type SingProductPriceQuery = (
+  { __typename?: 'Query' }
+  & { singProductPrice: (
+    { __typename?: 'ProductVariant' }
+    & Pick<ProductVariant, 'id'>
+    & { price?: Maybe<Array<(
+      { __typename?: 'ProductVariantPrice' }
+      & Pick<ProductVariantPrice, 'id' | 'price' | 'taxIncluded'>
+      & { promoprice?: Maybe<(
+        { __typename?: 'PromotionVariantPrice' }
+        & Pick<PromotionVariantPrice, 'id' | 'priceType' | 'value'>
+      )>, store?: Maybe<(
+        { __typename?: 'Store' }
+        & Pick<Store, 'id' | 'storeName'>
+        & { vendor?: Maybe<(
+          { __typename?: 'Vendor' }
+          & Pick<Vendor, 'id'>
+        )> }
+      )> }
+    )>> }
+  ) }
+);
+
+export type GetStocksAndZipAvailabilityQueryVariables = Exact<{
+  zipf: Scalars['Int'];
+  variantId: Scalars['ID'];
+  storeId: Scalars['ID'];
+}>;
+
+
+export type GetStocksAndZipAvailabilityQuery = (
+  { __typename?: 'Query' }
+  & { GetStocksAndZipAvailability: (
+    { __typename?: 'StockZip' }
+    & Pick<StockZip, 'zip' | 'stock'>
   ) }
 );
 
@@ -4007,3 +4555,89 @@ export function useSingProductInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type SingProductInfoQueryHookResult = ReturnType<typeof useSingProductInfoQuery>;
 export type SingProductInfoLazyQueryHookResult = ReturnType<typeof useSingProductInfoLazyQuery>;
 export type SingProductInfoQueryResult = Apollo.QueryResult<SingProductInfoQuery, SingProductInfoQueryVariables>;
+export const SingProductPriceDocument = gql`
+    query SingProductPrice($id: ID!) {
+  singProductPrice(id: $id) {
+    id
+    price {
+      id
+      price
+      promoprice {
+        id
+        priceType
+        value
+      }
+      taxIncluded
+      store {
+        id
+        storeName
+        vendor {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useSingProductPriceQuery__
+ *
+ * To run a query within a React component, call `useSingProductPriceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSingProductPriceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSingProductPriceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSingProductPriceQuery(baseOptions?: Apollo.QueryHookOptions<SingProductPriceQuery, SingProductPriceQueryVariables>) {
+        return Apollo.useQuery<SingProductPriceQuery, SingProductPriceQueryVariables>(SingProductPriceDocument, baseOptions);
+      }
+export function useSingProductPriceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SingProductPriceQuery, SingProductPriceQueryVariables>) {
+          return Apollo.useLazyQuery<SingProductPriceQuery, SingProductPriceQueryVariables>(SingProductPriceDocument, baseOptions);
+        }
+export type SingProductPriceQueryHookResult = ReturnType<typeof useSingProductPriceQuery>;
+export type SingProductPriceLazyQueryHookResult = ReturnType<typeof useSingProductPriceLazyQuery>;
+export type SingProductPriceQueryResult = Apollo.QueryResult<SingProductPriceQuery, SingProductPriceQueryVariables>;
+export const GetStocksAndZipAvailabilityDocument = gql`
+    query GetStocksAndZipAvailability($zipf: Int!, $variantId: ID!, $storeId: ID!) {
+  GetStocksAndZipAvailability(zipf: $zipf, variantId: $variantId, storeId: $storeId) {
+    zip
+    stock
+  }
+}
+    `;
+
+/**
+ * __useGetStocksAndZipAvailabilityQuery__
+ *
+ * To run a query within a React component, call `useGetStocksAndZipAvailabilityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStocksAndZipAvailabilityQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStocksAndZipAvailabilityQuery({
+ *   variables: {
+ *      zipf: // value for 'zipf'
+ *      variantId: // value for 'variantId'
+ *      storeId: // value for 'storeId'
+ *   },
+ * });
+ */
+export function useGetStocksAndZipAvailabilityQuery(baseOptions?: Apollo.QueryHookOptions<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>) {
+        return Apollo.useQuery<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>(GetStocksAndZipAvailabilityDocument, baseOptions);
+      }
+export function useGetStocksAndZipAvailabilityLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>) {
+          return Apollo.useLazyQuery<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>(GetStocksAndZipAvailabilityDocument, baseOptions);
+        }
+export type GetStocksAndZipAvailabilityQueryHookResult = ReturnType<typeof useGetStocksAndZipAvailabilityQuery>;
+export type GetStocksAndZipAvailabilityLazyQueryHookResult = ReturnType<typeof useGetStocksAndZipAvailabilityLazyQuery>;
+export type GetStocksAndZipAvailabilityQueryResult = Apollo.QueryResult<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>;

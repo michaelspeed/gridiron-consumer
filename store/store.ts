@@ -13,6 +13,28 @@ const IUser = types.model({
     lastName: types.string
 })
 
+const IProdVar = types.model({
+    id: types.string,
+    name: types.string,
+    assetUrl: types.string
+})
+
+const IProdStore = types.model({
+    id: types.string,
+    storeName: types.string
+})
+
+const IProdVarPrice = types.model({
+    id: types.string,
+    price: types.number
+})
+
+const ICartItem = types.model({
+    variant: IProdVar,
+    store: IProdStore,
+    price: IProdVarPrice
+})
+
 const IQType = types.model({
     id: types.string,
     type: types.enumeration('type', ['variant', 'product'])
@@ -23,7 +45,8 @@ const Store = types
         user: types.maybeNull(IUser),
         token: types.maybeNull(types.string),
         quickview: types.boolean,
-        qtype: types.maybeNull(IQType)
+        qtype: types.maybeNull(IQType),
+        cart: types.array(ICartItem)
     }).actions(self => {
         const setStoreLogin = (user, token?) => {
             self.user = user
@@ -46,7 +69,14 @@ const Store = types
         const setQuickViewNull = () => {
             self.qtype = null
         }
-        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout}
+        const AddToCart = (cartItem) => {
+            self.cart.push(cartItem)
+        }
+        const RemoveFromCart = (index) => {
+            self.cart.splice(index, 1)
+            /*self.cart = newCart*/
+        }
+        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout, AddToCart, RemoveFromCart}
     })
 
 export type IStore = Instance<typeof Store>

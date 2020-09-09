@@ -279,3 +279,33 @@ query singProductInfo($id: ID!) {
         productName
     }
 }
+
+query SingProductPrice($id: ID!){
+    singProductPrice(id: $id){
+        id
+        price {
+            id
+            price
+            promoprice {
+                id
+                priceType
+                value
+            }
+            taxIncluded
+            store {
+                id
+                storeName
+                vendor {
+                    id
+                }
+            }
+        }
+    }
+}
+
+query GetStocksAndZipAvailability($zipf: Int!, $variantId: ID!, $storeId: ID!){
+    GetStocksAndZipAvailability(zipf: $zipf, variantId:$variantId, storeId: $storeId) {
+        zip
+        stock
+    }
+}

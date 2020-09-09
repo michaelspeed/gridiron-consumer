@@ -7,7 +7,7 @@ export default withApollo(
     // @ts-ignore
     ({initialState}) => {
         const httpLink = createHttpLink({
-            uri: 'http://localhost:5588/shop-api',
+            uri: 'http://45.118.132.119:5588/shop-api',
         })
 
         let authLink

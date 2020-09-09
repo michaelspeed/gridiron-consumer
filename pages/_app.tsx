@@ -11,12 +11,16 @@ import "slick-carousel/slick/slick-theme.css";
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import Router from "next/router";
+import '@brainhubeu/react-carousel/lib/style.css';
+import {useStore} from "../store/store";
 
 Router.events.on('routeChangeStart', () => NProgress.start());
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp({Component, pageProps}) {
+
+    const store = useStore(pageProps.initialState)
 
     React.useEffect(() => {
         // Remove the server-side injected CSS.

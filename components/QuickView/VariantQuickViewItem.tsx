@@ -21,26 +21,45 @@ const VariantQuickViewItem = ({item}: Props) => {
         return master
     }
 
+    const lowPrice = () => {
+        let mainPrice = 0
+        for (const pr of item.price!) {
+            if (mainPrice === 0) {
+                mainPrice = pr.price
+            } else if (mainPrice > pr.price) {
+                mainPrice = pr.price
+            }
+        }
+        return mainPrice
+    }
+
     const navig = useRouter()
 
     return (
         <div className="row mt-5 mb-5" key={item.id}>
             <div className="col-lg-4 col-md-4 col-sm-4">
                 <div className="product-list-img" style={{padding: 10}}>
-                    <a href="javascript:;" onClick={() => navig.push(getProdRoute(item.id))}>
+                    <a href="javascript:;" onClick={(e) => {
+                        e.preventDefault()
+                        navig.push(getProdRoute(item.id))
+                    }}>
                         <img src={`${assetsURL}/${item.asset.asset.preview}`}  alt="" style={{height: 150, objectFit: "contain"}}/>
                     </a>
                 </div>
             </div>
             <div className="col-lg-8 col-md-8 col-sm-8">
                 <div className="shop-list-content ml-20">
-                    <h3><a href="javascript:;" style={{textDecoration: "none"}} onClick={() => navig.push(getProdRoute(item.id))}>{item.name}</a></h3>
+                    <h3><a href="javascript:;" style={{textDecoration: "none"}} onClick={(e) => {
+                        e.preventDefault()
+                        navig.push(getProdRoute(item.id))
+                    }}>{item.name}</a></h3>
                     {item.price!.length === 0}
-                    {item.price!.map(price => (
-                        <div className="pro-list-price">
-                            <span>₹{price.price}</span>
-                        </div>
-                    ))}
+                    {lowPrice() !== 0 && <div className="pro-list-price">
+                        <span>₹{lowPrice()}</span>
+                    </div>}
+                    {lowPrice() === 0 && <div className="pro-list-price">
+                        <span>Unavailable</span>
+                    </div>}
                     <p>
                         {item.product!.options!.map(opt => (
                             <React.Fragment>
@@ -52,7 +71,10 @@ const VariantQuickViewItem = ({item}: Props) => {
                     </p>
                     <div className="product-list-action">
                         <div className="product-action-cart">
-                            <button title="Add to Cart" style={{backgroundColor: primary}}>Add to cart</button>
+                            <button title="Add to Cart" style={{backgroundColor: primary}} onClick={(e) => {
+                                e.preventDefault()
+                                navig.push(getProdRoute(item.id))
+                            }}>View</button>
                         </div>
                     </div>
                 </div>

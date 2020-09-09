@@ -5,7 +5,7 @@ import {
     GetHomePageDocument,
     GetMenuDocument,
     GetSingleProductVariantDocument,
-    ProductVariant, Store
+    ProductVariant, ProductVariantPrice, SingProductPriceDocument, Store
 } from "../../gql";
 import withApollo from "../../utils/withApollo";
 import useScripts from "../../utils/useScript";
@@ -15,16 +15,28 @@ import clsx from "clsx";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import {primary} from "../../utils/colorConfig";
+import {multiSearchOr} from "../../utils/searchConfig";
+import {Button, Card, CardActionArea, CardContent, Drawer, IconButton, TextField, Typography} from "@material-ui/core";
+import ProdPrice from "../../components/Product/ProdPrice";
+import Carousel, { slidesToShowPlugin } from '@brainhubeu/react-carousel';
+
+// 0237670224
 
 interface Props {
     menu: any,
     variant: ProductVariant,
     store: Store
+    price: ProductVariantPrice[]
 }
 
-const SingleProduct = ({menu, variant, store}: Props) => {
+const SingleProduct = ({menu, variant, store, price}: Props) => {
 
     const [allAssets, setAllAllAssets] = useState<Asset[]>([])
+    const [booking, setBooking] = useState(false)
+    const [check, setCheck] = useState(false)
+    const [pincode, setPincode] = useState('')
+
+    console.log(price)
 
     useEffect(() => {
         let newallasset: any = []
@@ -39,11 +51,10 @@ const SingleProduct = ({menu, variant, store}: Props) => {
         setAllAllAssets(newallasset)
     },[variant])
 
-    console.log(variant)
     useScripts('/js/main.js')
 
     const optColor = (name) => {
-        if (variant.name.indexOf(name) === -1) {
+        if (variant.name.replace(/[^a-zA-Z0-9 ]/gi, '').split(" ").indexOf(name) > -1) {
             return {
                 back: '#FFFFFF',
                 color: '#000000'
@@ -54,6 +65,18 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                 color: '#FFFFFF'
             }
         }
+    }
+
+    const lowPrice = () => {
+        let mainPrice = 0
+        for (const pr of price) {
+            if (mainPrice === 0) {
+                mainPrice = pr.price
+            } else if (mainPrice > pr.price) {
+                mainPrice = pr.price
+            }
+        }
+        return mainPrice
     }
 
     return (
@@ -106,16 +129,19 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                                     </div>
                                 </div>
                                 <div className="pro-details-price">
-                                    <span>US $75.72</span>
-                                    <span className="old-price">US $95.72</span>
+                                    {lowPrice() !== 0 && <span>₹ {lowPrice()}</span>}
+                                    {lowPrice() === 0 && <div className="cart-checkout-btn">
+                                        <a className="btn-hover cart-btn-style" href="javascript:;">Unavailable</a>
+                                        </div>}
+                                    {/*<span className="old-price">US $95.72</span>*/}
                                 </div>
-                                {variant.product.options.map(item => (
-                                    <div className="pro-details-size">
+                                {variant.product.options.map((item) => (
+                                    <div className="pro-details-size" key={item.id}>
                                         <span>{item.name}:</span>
                                         <div className="pro-details-size-content">
                                             <ul>
                                                 {item.options.map(opt => (
-                                                    <li style={{backgroundColor: optColor(opt.code).back}}>
+                                                    <li style={{backgroundColor: optColor(opt.code).back}} key={opt.id}>
                                                         <a href="#" style={{width: "inherit", paddingLeft: 5, paddingRight: 5, color: optColor(opt.code).color}}>{opt.name}</a>
                                                     </li>
                                                 ))}
@@ -133,10 +159,21 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                                         ))}
                                     </ul>
                                 </div>
-                                <div className="pro-details-action-wrap">
-                                    <div className="pro-details-buy-now">
-                                        <a href="javascript:;" style={{backgroundColor: primary, textDecoration: "none"}}>Buy Now</a>
+                                {lowPrice() !== 0 && <div style={{display: "flex", flexDirection: "column", marginBottom: 10}}>
+                                    <span className='text-muted'>Please enter pin code</span>
+                                    <div style={{width: '100%'}}>
+                                        {check ? <span>{pincode}</span> : <TextField  label="Pin Code" value={pincode} onChange={event => setPincode(event.target.value)} />}
+                                        {check ? <Button color={"primary"} onClick={() => setCheck(false)}>
+                                            CHANGE
+                                        </Button> : <Button color={"primary"} onClick={() => setCheck(true)}>
+                                            CHECK
+                                        </Button>}
                                     </div>
+                                </div>}
+                                <div className="pro-details-action-wrap">
+                                    {check && <div className="pro-details-buy-now">
+                                        <a href="javascript:;" style={{backgroundColor: primary, textDecoration: "none"}} onClick={() => setBooking(true)}>Buy Now</a>
+                                    </div>}
                                     <div className="pro-details-action">
                                         <a className="social" title="Social" href="javascript:;">
                                             <i className="fas fa-share"></i>
@@ -455,6 +492,15 @@ const SingleProduct = ({menu, variant, store}: Props) => {
                     </div>
                 </div>
             </div>*/}
+            <Drawer open={booking} onClose={() => setBooking(false)} anchor={"bottom"}>
+                <div className='row'>
+                    {price.map(item => (
+                        <div key={item.id} className='col-md-2'>
+                            <ProdPrice item={item} variant={variant} zip={pincode}/>
+                        </div>
+                    ))}
+                </div>
+            </Drawer>
         </Layout>
     )
 }
@@ -462,7 +508,6 @@ const SingleProduct = ({menu, variant, store}: Props) => {
 SingleProduct.getInitialProps = async (ctx) => {
     const client = ctx.apolloClient;
     const id = ctx.query.id
-    console.log(id)
     const menu = await client.query({
         query: GetMenuDocument
     })
@@ -472,6 +517,14 @@ SingleProduct.getInitialProps = async (ctx) => {
             id
         }
     })
+
+    const variantPrice = await client.query({
+        query: SingProductPriceDocument,
+        variables: {
+            id
+        }
+    })
+
     const defaultStore = await client.query({
         query: GetDefaultStoreDocument
     })
@@ -482,7 +535,8 @@ SingleProduct.getInitialProps = async (ctx) => {
         menu,
         variant: variant.data.getSingleProductVariant,
         store: defaultStore.data.GetDefaultStore,
-        initialStore: getSnapshot(store)
+        initialStore: getSnapshot(store),
+        price: variantPrice.data.singProductPrice.price
     }
 }
 
