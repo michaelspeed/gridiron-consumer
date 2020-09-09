@@ -21,7 +21,7 @@ interface Props {
 const AccountPage = ({menu, store, query}: Props) => {
 
     useScripts('/js/main.js')
-    const {user} = useStore(null)
+    const {user} = useStore()
     const navig = useRouter()
 
     return (

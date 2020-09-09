@@ -20,7 +20,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 const AddressInfo = () => {
 
-    const {user} = useStore(null)
+    const {user} = useStore()
     const [newadd, setNewAdd] = useState(false)
     const [loading, setLoading] = useState(false)
     const [fullName, setFullName] = useState('')

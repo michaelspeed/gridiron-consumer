@@ -10,7 +10,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 const ProfileInfo = () => {
 
-    const {user} = useStore(null)
+    const {user} = useStore()
 
     const [fname, setFname] = useState('')
     const [lname, setLname] = useState('')

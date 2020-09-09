@@ -26,7 +26,7 @@ interface Props {
 
 const VariantSingle = ({menu, store, variant, prod}: Props) => {
 
-    const {setQuickView, setQuickViewType} = useStore(null)
+    const {setQuickView, setQuickViewType} = useStore()
 
     const navig = useRouter()
 

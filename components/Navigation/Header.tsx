@@ -23,7 +23,7 @@ const Header = observer(({menu, store}: Props) => {
 
     const [menuTree, setMenuTree] = useState<any[]>([])
 
-    const {setStoreLogin, user, setStoreLogout} = useStore(null)
+    const {setStoreLogin, user, setStoreLogout} = useStore()
 
     const {...coltree} = useQuery(GetCollectionTreeDocument)
 

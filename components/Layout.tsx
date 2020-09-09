@@ -23,7 +23,7 @@ const cancelIcon = { iconName: 'Cancel' };
 
 const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
 
-    const {quickview, setQuickView, setQuickViewNull, qtype} = useStore(null)
+    const {quickview, setQuickView, setQuickViewNull, qtype} = useStore()
 
     return (
         <React.Fragment>

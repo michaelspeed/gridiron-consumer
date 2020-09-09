@@ -36,8 +36,6 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
     const [check, setCheck] = useState(false)
     const [pincode, setPincode] = useState('')
 
-    console.log(price)
-
     useEffect(() => {
         let newallasset: any = []
         if(variant.asset) {

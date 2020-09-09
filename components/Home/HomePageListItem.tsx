@@ -16,7 +16,7 @@ const HomePageListItem = ({item}) => {
     })
 
     const navig = useRouter()
-    const {setQuickView, setQuickViewType} = useStore(null)
+    const {setQuickView, setQuickViewType} = useStore()
 
     console.log(item)
 

@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 
 export const CardSideBar = observer(() => {
 
-    const {cart, RemoveFromCart} = useStore(null)
+    const {cart, RemoveFromCart} = useStore()
 
     const totalPrice = () => {
         let prs = 0

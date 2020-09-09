@@ -14,7 +14,7 @@ interface Prop {
 
 const ProdPrice = observer(({item, zip, variant}: Prop) => {
 
-    const {AddToCart} = useStore(null)
+    const {AddToCart} = useStore()
 
     const {data, loading, error} = useQuery(GetStocksAndZipAvailabilityDocument, {
         variables: {

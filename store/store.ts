@@ -98,7 +98,7 @@ export function initializeStore(snapshot = null) {
     return store
 }
 
-export function useStore(initialState: any) {
+export function useStore(initialState?: any) {
     const store = useMemo(() => initializeStore(initialState), [initialState])
     return store
 }
