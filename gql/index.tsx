@@ -195,6 +195,7 @@ export type Store = {
   channelMarkets: Scalars['Boolean'];
   type: StoreTypeEnum;
   vendor?: Maybe<Vendor>;
+  cart: Array<CartItem>;
 };
 
 export enum StoreTypeEnum {
@@ -257,6 +258,7 @@ export type ProductVariant = {
   agreements: Array<BillingAgreement>;
   stock: Array<StockKeeping>;
   line: Array<OrderItem>;
+  carts: Array<CartItem>;
 };
 
 export type ProductVariantAsset = {
@@ -279,6 +281,7 @@ export type ProductVariantPrice = {
   variant: ProductVariant;
   store?: Maybe<Store>;
   promoprice?: Maybe<PromotionVariantPrice>;
+  cartItem?: Maybe<CartItem>;
 };
 
 export type ProductOption = {
@@ -340,6 +343,8 @@ export type ProductVariantSpecs = {
 export type Cart = {
   __typename?: 'Cart';
   id: Scalars['ID'];
+  items: Array<CartItem>;
+  user?: Maybe<User>;
 };
 
 export type View = {
@@ -447,6 +452,15 @@ export type DeliverySignIn = {
   updatedAt: Scalars['DateTime'];
   delivery: Delivery;
   pool: DeliveryPool;
+};
+
+export type CartItem = {
+  __typename?: 'CartItem';
+  id: Scalars['ID'];
+  cart: Cart;
+  variant: ProductVariant;
+  store: Store;
+  price: ProductVariantPrice;
 };
 
 export type Address = {
@@ -3226,6 +3240,7 @@ export type Query = {
   GetUserAddress: Array<Address>;
   GetAllSearch: Array<Search>;
   queryFacet: Array<Product>;
+  GetCart: Cart;
 };
 
 
@@ -3284,6 +3299,11 @@ export type QueryQueryFacetArgs = {
   id: Scalars['ID'];
 };
 
+
+export type QueryGetCartArgs = {
+  id: Scalars['ID'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   CreateUser: UserResponse;
@@ -3292,6 +3312,8 @@ export type Mutation = {
   CreateNewAddress: Address;
   UpdateNewAddress: Address;
   RegisterSearch: Search;
+  addToCart: CartItem;
+  removeCartItem: CartItem;
 };
 
 
@@ -3346,6 +3368,19 @@ export type MutationRegisterSearchArgs = {
   search: Scalars['String'];
 };
 
+
+export type MutationAddToCartArgs = {
+  price: Scalars['ID'];
+  store: Scalars['ID'];
+  variant: Scalars['ID'];
+  userId: Scalars['ID'];
+};
+
+
+export type MutationRemoveCartItemArgs = {
+  cartId: Scalars['ID'];
+};
+
 export type LoginUserMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -3396,6 +3431,56 @@ export type CreateNewAddressMutation = (
   & { CreateNewAddress: (
     { __typename?: 'Address' }
     & Pick<Address, 'id'>
+  ) }
+);
+
+export type CreateUserMutationVariables = Exact<{
+  fname: Scalars['String'];
+  lname: Scalars['String'];
+  phone: Scalars['String'];
+  password: Scalars['String'];
+  email: Scalars['String'];
+}>;
+
+
+export type CreateUserMutation = (
+  { __typename?: 'Mutation' }
+  & { CreateUser: (
+    { __typename?: 'UserResponse' }
+    & Pick<UserResponse, 'token'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'email' | 'phoneNumber' | 'verified' | 'firstName' | 'lastName'>
+    ) }
+  ) }
+);
+
+export type AddToCartMutationVariables = Exact<{
+  userId: Scalars['ID'];
+  store: Scalars['ID'];
+  variant: Scalars['ID'];
+  price: Scalars['ID'];
+}>;
+
+
+export type AddToCartMutation = (
+  { __typename?: 'Mutation' }
+  & { addToCart: (
+    { __typename?: 'CartItem' }
+    & Pick<CartItem, 'id'>
+  ) }
+);
+
+export type RemoveCartItemMutationVariables = Exact<{
+  cartId: Scalars['ID'];
+}>;
+
+
+export type RemoveCartItemMutation = (
+  { __typename?: 'Mutation' }
+  & { removeCartItem: (
+    { __typename?: 'CartItem' }
+    & Pick<CartItem, 'id'>
   ) }
 );
 
@@ -3620,6 +3705,32 @@ export type GetCurrentUserQuery = (
   & { GetCurrentUser: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'email' | 'verified' | 'verificationToken' | 'lastLogin' | 'firstName' | 'lastName' | 'phoneNumber'>
+    & { cart?: Maybe<(
+      { __typename?: 'Cart' }
+      & Pick<Cart, 'id'>
+      & { items: Array<(
+        { __typename?: 'CartItem' }
+        & Pick<CartItem, 'id'>
+        & { variant: (
+          { __typename?: 'ProductVariant' }
+          & Pick<ProductVariant, 'id' | 'name'>
+          & { asset: (
+            { __typename?: 'ProductVariantAsset' }
+            & Pick<ProductVariantAsset, 'id'>
+            & { asset: (
+              { __typename?: 'Asset' }
+              & Pick<Asset, 'preview'>
+            ) }
+          ) }
+        ), store: (
+          { __typename?: 'Store' }
+          & Pick<Store, 'id' | 'storeName'>
+        ), price: (
+          { __typename?: 'ProductVariantPrice' }
+          & Pick<ProductVariantPrice, 'id' | 'price'>
+        ) }
+      )> }
+    )> }
   ) }
 );
 
@@ -3871,6 +3982,117 @@ export function useCreateNewAddressMutation(baseOptions?: Apollo.MutationHookOpt
 export type CreateNewAddressMutationHookResult = ReturnType<typeof useCreateNewAddressMutation>;
 export type CreateNewAddressMutationResult = Apollo.MutationResult<CreateNewAddressMutation>;
 export type CreateNewAddressMutationOptions = Apollo.BaseMutationOptions<CreateNewAddressMutation, CreateNewAddressMutationVariables>;
+export const CreateUserDocument = gql`
+    mutation CreateUser($fname: String!, $lname: String!, $phone: String!, $password: String!, $email: String!) {
+  CreateUser(fname: $fname, lname: $lname, phone: $phone, password: $password, email: $email) {
+    user {
+      id
+      email
+      phoneNumber
+      verified
+      firstName
+      lastName
+    }
+    token
+  }
+}
+    `;
+export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      fname: // value for 'fname'
+ *      lname: // value for 'lname'
+ *      phone: // value for 'phone'
+ *      password: // value for 'password'
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, baseOptions);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const AddToCartDocument = gql`
+    mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!) {
+  addToCart(userId: $userId, store: $store, variant: $variant, price: $price) {
+    id
+  }
+}
+    `;
+export type AddToCartMutationFn = Apollo.MutationFunction<AddToCartMutation, AddToCartMutationVariables>;
+
+/**
+ * __useAddToCartMutation__
+ *
+ * To run a mutation, you first call `useAddToCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddToCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addToCartMutation, { data, loading, error }] = useAddToCartMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      store: // value for 'store'
+ *      variant: // value for 'variant'
+ *      price: // value for 'price'
+ *   },
+ * });
+ */
+export function useAddToCartMutation(baseOptions?: Apollo.MutationHookOptions<AddToCartMutation, AddToCartMutationVariables>) {
+        return Apollo.useMutation<AddToCartMutation, AddToCartMutationVariables>(AddToCartDocument, baseOptions);
+      }
+export type AddToCartMutationHookResult = ReturnType<typeof useAddToCartMutation>;
+export type AddToCartMutationResult = Apollo.MutationResult<AddToCartMutation>;
+export type AddToCartMutationOptions = Apollo.BaseMutationOptions<AddToCartMutation, AddToCartMutationVariables>;
+export const RemoveCartItemDocument = gql`
+    mutation RemoveCartItem($cartId: ID!) {
+  removeCartItem(cartId: $cartId) {
+    id
+  }
+}
+    `;
+export type RemoveCartItemMutationFn = Apollo.MutationFunction<RemoveCartItemMutation, RemoveCartItemMutationVariables>;
+
+/**
+ * __useRemoveCartItemMutation__
+ *
+ * To run a mutation, you first call `useRemoveCartItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveCartItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeCartItemMutation, { data, loading, error }] = useRemoveCartItemMutation({
+ *   variables: {
+ *      cartId: // value for 'cartId'
+ *   },
+ * });
+ */
+export function useRemoveCartItemMutation(baseOptions?: Apollo.MutationHookOptions<RemoveCartItemMutation, RemoveCartItemMutationVariables>) {
+        return Apollo.useMutation<RemoveCartItemMutation, RemoveCartItemMutationVariables>(RemoveCartItemDocument, baseOptions);
+      }
+export type RemoveCartItemMutationHookResult = ReturnType<typeof useRemoveCartItemMutation>;
+export type RemoveCartItemMutationResult = Apollo.MutationResult<RemoveCartItemMutation>;
+export type RemoveCartItemMutationOptions = Apollo.BaseMutationOptions<RemoveCartItemMutation, RemoveCartItemMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -4337,6 +4559,30 @@ export const GetCurrentUserDocument = gql`
     firstName
     lastName
     phoneNumber
+    cart {
+      id
+      items {
+        id
+        variant {
+          id
+          name
+          asset {
+            id
+            asset {
+              preview
+            }
+          }
+        }
+        store {
+          id
+          storeName
+        }
+        price {
+          id
+          price
+        }
+      }
+    }
   }
 }
     `;

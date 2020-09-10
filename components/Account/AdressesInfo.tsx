@@ -12,6 +12,7 @@ import {
 } from "../../gql";
 import {useMutation, useQuery} from "@apollo/client";
 import { LoadingOutlined } from '@ant-design/icons';
+import withApollo from "../../utils/withApollo";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -175,4 +176,4 @@ const AddressInfo = () => {
     )
 }
 
-export default observer(AddressInfo)
+export default withApollo(observer(AddressInfo))

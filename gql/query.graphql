@@ -195,6 +195,30 @@ query GetCurrentUser {
         firstName
         lastName
         phoneNumber
+        cart {
+            id
+            items {
+                id
+                variant {
+                    id
+                    name
+                    asset{
+                        id
+                        asset {
+                            preview
+                        }
+                    }
+                }
+                store {
+                    id
+                    storeName
+                }
+                price {
+                    id
+                    price
+                }
+            }
+        }
     }
 }
 

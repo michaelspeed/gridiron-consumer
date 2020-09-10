@@ -35,3 +35,29 @@ mutation CreateNewAddress($fullName: String!, $addressLine: String!, $city: Stri
         id
     }
 }
+
+mutation CreateUser($fname: String!, $lname: String!, $phone: String!, $password: String!, $email: String!){
+    CreateUser(fname: $fname, lname: $lname, phone: $phone, password: $password, email: $email){
+        user {
+            id
+            email
+            phoneNumber
+            verified
+            firstName
+            lastName
+        }
+        token
+    }
+}
+
+mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!) {
+    addToCart(userId: $userId, store: $store, variant: $variant, price: $price){
+        id
+    }
+}
+
+mutation RemoveCartItem($cartId: ID!){
+    removeCartItem(cartId: $cartId) {
+        id
+    }
+}

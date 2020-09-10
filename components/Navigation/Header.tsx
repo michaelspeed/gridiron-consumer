@@ -1,7 +1,12 @@
 import React, {useEffect, useState} from "react"
-import {CardSideBar} from "../Cart/CartSideBar";
-import CollectionSelect from "./CollectionSelect";
-import {Collection, GetCollectionTreeDocument, GetCurrentUserDocument, LoginUserDocument, Store} from "../../gql";
+import {
+    Collection,
+    CreateUserDocument,
+    GetCollectionTreeDocument,
+    GetCurrentUserDocument,
+    LoginUserDocument,
+    Store
+} from "../../gql";
 import {useMutation, useQuery} from "@apollo/client";
 import {Button, Dropdown, Input, Menu, message, Modal} from "antd";
 import {useRouter, withRouter} from "next/router";
@@ -11,6 +16,8 @@ import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
 import { UserOutlined } from '@ant-design/icons';
 import {getCollectionRoute, getFacetRoute} from "../../utils/routingUtils";
+import Cookies from 'universal-cookie';
+import CardSideBar from "../Cart/CartSideBar";
 
 interface Props {
     menu: string,
@@ -37,8 +44,12 @@ const Header = observer(({menu, store}: Props) => {
     const [rrmail, setREmail] = useState('')
     const [rpass, setRPass] = useState('')
     const [rphone, setRPhone] = useState('')
+    const [fname, setFname] = useState('')
+    const [lname, setLname] = useState('')
 
     const [search, setSearch] = useState('')
+
+    const cookie = new Cookies()
 
     const navig = useRouter()
 
@@ -65,9 +76,18 @@ const Header = observer(({menu, store}: Props) => {
         }
     })
 
+    const [RegisterUser] = useMutation(CreateUserDocument, {
+        variables: {
+            fname: fname,
+            lname: lname,
+            phone: rphone,
+            password: rpass,
+            email: rrmail
+        }
+    })
+
     useEffect(() => {
         setMenuTree(JSON.parse(menu))
-        console.log(JSON.parse(menu))
     }, [menu])
 
     const ClickMenuItem = (item) => {
@@ -205,14 +225,15 @@ const Header = observer(({menu, store}: Props) => {
                                             </form>
                                         </div>
                                         <div className="same-style header-cart">
-                                            <a className="cart-active" href="#"><i
-                                                className="icofont-shopping-cart"></i></a>
+                                            <a className="cart-active" href="#">
+                                                <i className="icofont-shopping-cart"></i>
+                                            </a>
                                         </div>
                                         {user && <div className="same-style header-cart ml-5">
                                             <Dropdown overlay={() => (
                                                 <Menu>
                                                     <Menu.Item>
-                                                        <a href="javascript:;" onClick={() => navig.push('/accounts?q=order')}>
+                                                        <a href="javascript:;" onClick={() => navig.push('/accounts?q=orders')}>
                                                             Order
                                                         </a>
                                                     </Menu.Item>
@@ -335,6 +356,8 @@ const Header = observer(({menu, store}: Props) => {
                                     setLoading(true)
                                     LoginUser()
                                         .then(value => {
+                                            localStorage.setItem(GridIronConstants, value.data!.LoginUser!.token)
+                                            cookie.set(GridIronConstants, value.data!.LoginUser!.token)
                                             setLoading(false)
                                             setLogin(false)
                                             setStoreLogin({
@@ -358,6 +381,14 @@ const Header = observer(({menu, store}: Props) => {
             <Modal visible={register} footer={null} title={<h6 style={{color: primary, marginBottom: -10}}>Register</h6>} closable={false} onCancel={() => setRegister(false)}>
                 <div className='container'>
                     <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>First Name</label>
+                        <Input placeholder="First Name" value={fname} onChange={event => setFname(event.target.value)}/>
+                    </div>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
+                        <label>Last Name</label>
+                        <Input placeholder="Last Name" value={lname} onChange={event => setLname(event.target.value)}/>
+                    </div>
+                    <div style={{marginTop: 10, marginBottom: 10}}>
                         <label>Email</label>
                         <Input placeholder="Email" value={rrmail} onChange={event => setREmail(event.target.value)}/>
                     </div>
@@ -367,10 +398,33 @@ const Header = observer(({menu, store}: Props) => {
                     </div>
                     <div style={{marginTop: 10, marginBottom: 10}}>
                         <label>Password</label>
-                        <Input placeholder="Password" value={rpass} onChange={event => setRPass(event.target.value)}/>
+                        <Input placeholder="Password" type={"password"} value={rpass} onChange={event => setRPass(event.target.value)}/>
                     </div>
                     <div>
-                        <Button type={"primary"}>Register</Button>
+                        <Button type={"primary"} loading={loading}
+                                onClick={() => {
+                                    setLoading(true)
+                                    RegisterUser()
+                                        .then(value => {
+                                            localStorage.setItem(GridIronConstants, value.data!.CreateUser!.token)
+                                            cookie.set(GridIronConstants, value.data!.CreateUser!.token)
+                                            setLoading(false)
+                                            setRegister(false)
+                                            setStoreLogin({
+                                                id: value.data.CreateUser.user.id,
+                                                email: value.data.CreateUser.user.email,
+                                                phone: value.data.CreateUser.user.phoneNumber,
+                                                verified: value.data.CreateUser.user.verified,
+                                                firstName: value.data.CreateUser.user.firstName,
+                                                lastName: value.data.CreateUser.user.lastName
+                                            })
+                                        })
+                                        .catch(error => {
+                                            setLoading(false)
+                                            message.error(error.message)
+                                        })
+                                }}
+                        >Register</Button>
                     </div>
                 </div>
             </Modal>

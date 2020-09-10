@@ -4,6 +4,8 @@ import {GridIronConstants} from "../utils/globalconstants";
 
 let store: IStore | undefined
 
+export const CartSSD = "cart-ssd"
+
 const IUser = types.model({
     id: types.string,
     email: types.string,
@@ -48,6 +50,13 @@ const Store = types
         qtype: types.maybeNull(IQType),
         cart: types.array(ICartItem)
     }).actions(self => {
+        const loadCart = () => {
+            const cart = localStorage.getItem(CartSSD)
+            console.log(cart)
+            if (cart) {
+                self.cart = JSON.parse(cart)
+            }
+        }
         const setStoreLogin = (user, token?) => {
             self.user = user
             if (token) {
@@ -71,12 +80,13 @@ const Store = types
         }
         const AddToCart = (cartItem) => {
             self.cart.push(cartItem)
+            localStorage.setItem(CartSSD, JSON.stringify(self.cart))
         }
         const RemoveFromCart = (index) => {
             self.cart.splice(index, 1)
-            /*self.cart = newCart*/
+            localStorage.setItem(CartSSD, JSON.stringify(self.cart))
         }
-        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout, AddToCart, RemoveFromCart}
+        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout, AddToCart, RemoveFromCart, loadCart}
     })
 
 export type IStore = Instance<typeof Store>

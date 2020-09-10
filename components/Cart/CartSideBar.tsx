@@ -2,10 +2,22 @@ import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
 import {assetsURL} from "../../utils/globalconstants";
 import {useEffect, useState} from "react";
+import {useRouter, withRouter} from "next/router";
 
-export const CardSideBar = observer(() => {
+const CardSideBar = observer(() => {
 
-    const {cart, RemoveFromCart} = useStore()
+    const {cart, RemoveFromCart, loadCart} = useStore()
+
+    const [init, setInit] = useState(false)
+
+    const navig = useRouter()
+
+    useEffect(() => {
+     if (!init) {
+         loadCart()
+         setInit(true)
+     }
+    })
 
     const totalPrice = () => {
         let prs = 0
@@ -41,10 +53,16 @@ export const CardSideBar = observer(() => {
                         <h4>Subtotal: <span>₹{totalPrice()}</span></h4>
                     </div>
                     <div className="cart-checkout-btn">
-                        <a className="btn-hover cart-btn-style" href="cart.html">View cart / Checkout</a>
+                        <a className="btn-hover cart-btn-style" href="javascript:;"
+                           onClick={() => {
+                               navig.push('/checkout')
+                           }}
+                        >View cart / Checkout</a>
                     </div>
                 </div>
             </div>
         </div>
     )
 })
+
+export default withRouter<any>(CardSideBar)
