@@ -50,14 +50,23 @@ mutation CreateUser($fname: String!, $lname: String!, $phone: String!, $password
     }
 }
 
-mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!) {
-    addToCart(userId: $userId, store: $store, variant: $variant, price: $price){
+mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!, $quantity: Int!) {
+    addToCart(userId: $userId, store: $store, variant: $variant, price: $price, quantity: $quantity){
         id
     }
 }
 
 mutation RemoveCartItem($cartId: ID!){
     removeCartItem(cartId: $cartId) {
+        id
+    }
+}
+
+mutation createShopOrder($orderLineDto: [CartItemDto!]!, $address: String!){
+    createShopOrder(
+        orderLineDto: $orderLineDto,
+        address: $address
+    ) {
         id
     }
 }

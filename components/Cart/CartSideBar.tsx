@@ -41,7 +41,7 @@ const CardSideBar = observer(() => {
                                 </div>
                                 <div className="cart-title">
                                     <h4><a href="#">{catitem.variant.name}</a></h4>
-                                    <span> 1 × ₹{catitem.price.price}	</span>
+                                    <span> {catitem.quantity} × ₹{catitem.price.price}	</span>
                                 </div>
                                 <div className="cart-delete">
                                     <a href="javascript:;" onClick={() => RemoveFromCart(index)}>×</a>

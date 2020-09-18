@@ -219,6 +219,17 @@ query GetCurrentUser {
                 }
             }
         }
+        address {
+            id
+            fullName
+            addressLine
+            city
+            state
+            landmark
+            postalCode
+            phoneNumber
+            addressType
+        }
     }
 }
 
@@ -331,5 +342,12 @@ query GetStocksAndZipAvailability($zipf: Int!, $variantId: ID!, $storeId: ID!){
     GetStocksAndZipAvailability(zipf: $zipf, variantId:$variantId, storeId: $storeId) {
         zip
         stock
+    }
+}
+
+query getPaymentCodes {
+    getPaymentCodes {
+        id
+        api
     }
 }

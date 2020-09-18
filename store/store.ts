@@ -34,7 +34,8 @@ const IProdVarPrice = types.model({
 const ICartItem = types.model({
     variant: IProdVar,
     store: IProdStore,
-    price: IProdVarPrice
+    price: IProdVarPrice,
+    quantity: types.number
 })
 
 const IQType = types.model({
@@ -86,7 +87,28 @@ const Store = types
             self.cart.splice(index, 1)
             localStorage.setItem(CartSSD, JSON.stringify(self.cart))
         }
-        return {setStoreLogin, setQuickView, setQuickViewType, setQuickViewNull, setStoreLogout, AddToCart, RemoveFromCart, loadCart}
+        const AddQuantity = (index) => {
+            self.cart[index].quantity = self.cart[index].quantity + 1
+        }
+        const RemoveQuantity = (index) => {
+            if (self.cart[index].quantity === 1) {
+                self.cart.splice(index, 1)
+            } else {
+                self.cart[index].quantity = self.cart[index].quantity - 1
+            }
+        }
+        return {
+            setStoreLogin,
+            setQuickView,
+            setQuickViewType,
+            setQuickViewNull,
+            setStoreLogout,
+            AddToCart,
+            RemoveFromCart,
+            loadCart,
+            AddQuantity,
+            RemoveQuantity
+        }
     })
 
 export type IStore = Instance<typeof Store>

@@ -2,7 +2,7 @@ import withApollo from "next-with-apollo";
 import {ApolloClient, ApolloProvider, createHttpLink, InMemoryCache} from "@apollo/client";
 import {setContext} from "@apollo/client/link/context";
 import {GridIronConstants} from "./globalconstants";
-import Cookies from "universal-cookie";
+import Cookies from 'js-cookie'
 
 export default withApollo(
     // @ts-ignore
@@ -11,11 +11,9 @@ export default withApollo(
             uri: 'http://45.118.132.119:5588/shop-api',
         })
 
-        const cookies = new Cookies();
-
         let authLink
-        let token = cookies.get(GridIronConstants)
         authLink = setContext((_, {headers}) => {
+            let token = Cookies.get(GridIronConstants)
             return {
                 headers: {
                     ...headers,
@@ -24,7 +22,10 @@ export default withApollo(
             }
         });
 
+        const isBrowser = typeof window !== "undefined"
+
         return new ApolloClient({
+            ssrMode: !isBrowser,
             link: authLink.concat(httpLink),
             cache: new InMemoryCache().restore(prop.initialState || {}),
         });

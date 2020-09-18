@@ -45,6 +45,7 @@ export default class MyDocument extends Document<any> {
                           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
                           crossOrigin="anonymous"/>
                     <style type="text/css" dangerouslySetInnerHTML={{__html: this.props.styleTags}} />
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"/>
                 </Head>
                 <body>
                 <Main/>

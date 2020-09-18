@@ -454,9 +454,20 @@ export type DeliverySignIn = {
   pool: DeliveryPool;
 };
 
+export type PaymentMethod = {
+  __typename?: 'PaymentMethod';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  api: Scalars['String'];
+  secretKey: Scalars['String'];
+  enabled: Scalars['Boolean'];
+};
+
 export type CartItem = {
   __typename?: 'CartItem';
   id: Scalars['ID'];
+  quantity: Scalars['Float'];
   cart: Cart;
   variant: ProductVariant;
   store: Store;
@@ -3241,6 +3252,7 @@ export type Query = {
   GetAllSearch: Array<Search>;
   queryFacet: Array<Product>;
   GetCart: Cart;
+  getPaymentCodes: PaymentMethod;
 };
 
 
@@ -3314,6 +3326,7 @@ export type Mutation = {
   RegisterSearch: Search;
   addToCart: CartItem;
   removeCartItem: CartItem;
+  createShopOrder: Order;
 };
 
 
@@ -3370,6 +3383,7 @@ export type MutationRegisterSearchArgs = {
 
 
 export type MutationAddToCartArgs = {
+  quantity: Scalars['Int'];
   price: Scalars['ID'];
   store: Scalars['ID'];
   variant: Scalars['ID'];
@@ -3379,6 +3393,17 @@ export type MutationAddToCartArgs = {
 
 export type MutationRemoveCartItemArgs = {
   cartId: Scalars['ID'];
+};
+
+
+export type MutationCreateShopOrderArgs = {
+  orderLineDto: Array<CartItemDto>;
+  address: Scalars['String'];
+};
+
+export type CartItemDto = {
+  priceId: Scalars['String'];
+  quantity: Scalars['Float'];
 };
 
 export type LoginUserMutationVariables = Exact<{
@@ -3460,6 +3485,7 @@ export type AddToCartMutationVariables = Exact<{
   store: Scalars['ID'];
   variant: Scalars['ID'];
   price: Scalars['ID'];
+  quantity: Scalars['Int'];
 }>;
 
 
@@ -3481,6 +3507,20 @@ export type RemoveCartItemMutation = (
   & { removeCartItem: (
     { __typename?: 'CartItem' }
     & Pick<CartItem, 'id'>
+  ) }
+);
+
+export type CreateShopOrderMutationVariables = Exact<{
+  orderLineDto: Array<CartItemDto>;
+  address: Scalars['String'];
+}>;
+
+
+export type CreateShopOrderMutation = (
+  { __typename?: 'Mutation' }
+  & { createShopOrder: (
+    { __typename?: 'Order' }
+    & Pick<Order, 'id'>
   ) }
 );
 
@@ -3730,7 +3770,10 @@ export type GetCurrentUserQuery = (
           & Pick<ProductVariantPrice, 'id' | 'price'>
         ) }
       )> }
-    )> }
+    )>, address?: Maybe<Array<(
+      { __typename?: 'Address' }
+      & Pick<Address, 'id' | 'fullName' | 'addressLine' | 'city' | 'state' | 'landmark' | 'postalCode' | 'phoneNumber' | 'addressType'>
+    )>> }
   ) }
 );
 
@@ -3861,6 +3904,17 @@ export type GetStocksAndZipAvailabilityQuery = (
   & { GetStocksAndZipAvailability: (
     { __typename?: 'StockZip' }
     & Pick<StockZip, 'zip' | 'stock'>
+  ) }
+);
+
+export type GetPaymentCodesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPaymentCodesQuery = (
+  { __typename?: 'Query' }
+  & { getPaymentCodes: (
+    { __typename?: 'PaymentMethod' }
+    & Pick<PaymentMethod, 'id' | 'api'>
   ) }
 );
 
@@ -4027,8 +4081,8 @@ export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutati
 export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
 export const AddToCartDocument = gql`
-    mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!) {
-  addToCart(userId: $userId, store: $store, variant: $variant, price: $price) {
+    mutation AddToCart($userId: ID!, $store: ID!, $variant: ID!, $price: ID!, $quantity: Int!) {
+  addToCart(userId: $userId, store: $store, variant: $variant, price: $price, quantity: $quantity) {
     id
   }
 }
@@ -4052,6 +4106,7 @@ export type AddToCartMutationFn = Apollo.MutationFunction<AddToCartMutation, Add
  *      store: // value for 'store'
  *      variant: // value for 'variant'
  *      price: // value for 'price'
+ *      quantity: // value for 'quantity'
  *   },
  * });
  */
@@ -4093,6 +4148,39 @@ export function useRemoveCartItemMutation(baseOptions?: Apollo.MutationHookOptio
 export type RemoveCartItemMutationHookResult = ReturnType<typeof useRemoveCartItemMutation>;
 export type RemoveCartItemMutationResult = Apollo.MutationResult<RemoveCartItemMutation>;
 export type RemoveCartItemMutationOptions = Apollo.BaseMutationOptions<RemoveCartItemMutation, RemoveCartItemMutationVariables>;
+export const CreateShopOrderDocument = gql`
+    mutation createShopOrder($orderLineDto: [CartItemDto!]!, $address: String!) {
+  createShopOrder(orderLineDto: $orderLineDto, address: $address) {
+    id
+  }
+}
+    `;
+export type CreateShopOrderMutationFn = Apollo.MutationFunction<CreateShopOrderMutation, CreateShopOrderMutationVariables>;
+
+/**
+ * __useCreateShopOrderMutation__
+ *
+ * To run a mutation, you first call `useCreateShopOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateShopOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createShopOrderMutation, { data, loading, error }] = useCreateShopOrderMutation({
+ *   variables: {
+ *      orderLineDto: // value for 'orderLineDto'
+ *      address: // value for 'address'
+ *   },
+ * });
+ */
+export function useCreateShopOrderMutation(baseOptions?: Apollo.MutationHookOptions<CreateShopOrderMutation, CreateShopOrderMutationVariables>) {
+        return Apollo.useMutation<CreateShopOrderMutation, CreateShopOrderMutationVariables>(CreateShopOrderDocument, baseOptions);
+      }
+export type CreateShopOrderMutationHookResult = ReturnType<typeof useCreateShopOrderMutation>;
+export type CreateShopOrderMutationResult = Apollo.MutationResult<CreateShopOrderMutation>;
+export type CreateShopOrderMutationOptions = Apollo.BaseMutationOptions<CreateShopOrderMutation, CreateShopOrderMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -4583,6 +4671,17 @@ export const GetCurrentUserDocument = gql`
         }
       }
     }
+    address {
+      id
+      fullName
+      addressLine
+      city
+      state
+      landmark
+      postalCode
+      phoneNumber
+      addressType
+    }
   }
 }
     `;
@@ -4887,3 +4986,36 @@ export function useGetStocksAndZipAvailabilityLazyQuery(baseOptions?: Apollo.Laz
 export type GetStocksAndZipAvailabilityQueryHookResult = ReturnType<typeof useGetStocksAndZipAvailabilityQuery>;
 export type GetStocksAndZipAvailabilityLazyQueryHookResult = ReturnType<typeof useGetStocksAndZipAvailabilityLazyQuery>;
 export type GetStocksAndZipAvailabilityQueryResult = Apollo.QueryResult<GetStocksAndZipAvailabilityQuery, GetStocksAndZipAvailabilityQueryVariables>;
+export const GetPaymentCodesDocument = gql`
+    query getPaymentCodes {
+  getPaymentCodes {
+    id
+    api
+  }
+}
+    `;
+
+/**
+ * __useGetPaymentCodesQuery__
+ *
+ * To run a query within a React component, call `useGetPaymentCodesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentCodesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaymentCodesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetPaymentCodesQuery(baseOptions?: Apollo.QueryHookOptions<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>) {
+        return Apollo.useQuery<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>(GetPaymentCodesDocument, baseOptions);
+      }
+export function useGetPaymentCodesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>) {
+          return Apollo.useLazyQuery<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>(GetPaymentCodesDocument, baseOptions);
+        }
+export type GetPaymentCodesQueryHookResult = ReturnType<typeof useGetPaymentCodesQuery>;
+export type GetPaymentCodesLazyQueryHookResult = ReturnType<typeof useGetPaymentCodesLazyQuery>;
+export type GetPaymentCodesQueryResult = Apollo.QueryResult<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>;

@@ -5,14 +5,16 @@ import {danger} from "../../utils/colorConfig";
 import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
 import {CartItem, ProdStore, ProdVar, ProdVarPrice} from "../../utils/cartInterface";
+import {message} from "antd";
 
 interface Prop {
     item: ProductVariantPrice,
     zip?: string
     variant?: ProductVariant
+    onClose?: any
 }
 
-const ProdPrice = observer(({item, zip, variant}: Prop) => {
+const ProdPrice = observer(({item, zip, variant, onClose}: Prop) => {
 
     const {AddToCart} = useStore()
 
@@ -64,10 +66,13 @@ const ProdPrice = observer(({item, zip, variant}: Prop) => {
                                         const cartItem: CartItem = {
                                             variant: varia,
                                             store: store,
-                                            price: price
+                                            price: price,
+                                            quantity: 1
                                         }
 
                                         AddToCart(cartItem)
+                                        message.success('Item added to cart')
+                                        onClose()
                                     }}
                             >Add To Cart</Button>
                             }

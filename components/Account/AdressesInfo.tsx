@@ -7,7 +7,7 @@ import {
     Address,
     AddressType,
     CreateNewAddressDocument,
-    CreateNewAddressMutationVariables,
+    CreateNewAddressMutationVariables, GetCurrentUserDocument, GetCurrentUserQueryVariables,
     GetUserAddressDocument, GetUserAddressQueryVariables
 } from "../../gql";
 import {useMutation, useQuery} from "@apollo/client";
@@ -46,9 +46,8 @@ const AddressInfo = () => {
         }
     })
 
-    const {data, error, ...addLoad} = useQuery<{GetUserAddress: Address[]}, GetUserAddressQueryVariables>(GetUserAddressDocument)
+    const {data, error, ...addLoad} = useQuery<any, GetCurrentUserQueryVariables>(GetCurrentUserDocument)
 
-    console.log(data)
 
     return (
         <React.Fragment>
@@ -154,7 +153,7 @@ const AddressInfo = () => {
                     </div>
                 </div>}
                 {data && <div>
-                    {data!.GetUserAddress.map(adds => (
+                    {data!.GetCurrentUser.address.map(adds => (
                         <div className="myaccount-content">
                             <address>
                                 <p><strong>{adds.fullName}</strong>  / {adds.phoneNumber} / {adds.addressType}</p>

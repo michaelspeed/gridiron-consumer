@@ -16,7 +16,7 @@ import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
 import { UserOutlined } from '@ant-design/icons';
 import {getCollectionRoute, getFacetRoute} from "../../utils/routingUtils";
-import Cookies from 'universal-cookie';
+import Cookies from 'js-cookie'
 import CardSideBar from "../Cart/CartSideBar";
 
 interface Props {
@@ -356,8 +356,8 @@ const Header = observer(({menu, store}: Props) => {
                                     setLoading(true)
                                     LoginUser()
                                         .then(value => {
-                                            localStorage.setItem(GridIronConstants, value.data!.LoginUser!.token)
-                                            cookie.set(GridIronConstants, value.data!.LoginUser!.token)
+                                            // localStorage.setItem(GridIronConstants, value.data!.LoginUser!.token)
+                                            Cookies.set(GridIronConstants, value.data!.LoginUser!.token)
                                             setLoading(false)
                                             setLogin(false)
                                             setStoreLogin({
@@ -406,8 +406,8 @@ const Header = observer(({menu, store}: Props) => {
                                     setLoading(true)
                                     RegisterUser()
                                         .then(value => {
-                                            localStorage.setItem(GridIronConstants, value.data!.CreateUser!.token)
-                                            cookie.set(GridIronConstants, value.data!.CreateUser!.token)
+                                            // localStorage.setItem(GridIronConstants, value.data!.CreateUser!.token)
+                                            Cookies.set(GridIronConstants, value.data!.CreateUser!.token)
                                             setLoading(false)
                                             setRegister(false)
                                             setStoreLogin({

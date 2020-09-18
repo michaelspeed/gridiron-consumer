@@ -17,5 +17,6 @@ export interface ProdVarPrice {
 export interface CartItem {
     variant: ProdVar,
     store: ProdStore,
-    price: ProdVarPrice
+    price: ProdVarPrice,
+    quantity: number
 }

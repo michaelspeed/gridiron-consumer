@@ -494,7 +494,7 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                 <div className='row'>
                     {price.map(item => (
                         <div key={item.id} className='col-md-2'>
-                            <ProdPrice item={item} variant={variant} zip={pincode}/>
+                            <ProdPrice item={item} variant={variant} zip={pincode} onClose={() => setBooking(false)}/>
                         </div>
                     ))}
                 </div>
