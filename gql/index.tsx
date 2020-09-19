@@ -158,6 +158,7 @@ export type User = {
   delivery?: Maybe<Delivery>;
   cart?: Maybe<Cart>;
   view: Array<View>;
+  reviews: Array<Review>;
   address?: Maybe<Array<Address>>;
   order?: Maybe<Array<Order>>;
 };
@@ -230,21 +231,6 @@ export type ProductAsset = {
   asset: Asset;
 };
 
-export type StockKeeping = {
-  __typename?: 'StockKeeping';
-  id: Scalars['ID'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  quantity: Scalars['Float'];
-  available_quantity: Scalars['Float'];
-  threshold: Scalars['Float'];
-  multiple: Scalars['Boolean'];
-  backorder: Scalars['Boolean'];
-  stockstatus: Scalars['Boolean'];
-  sku: Scalars['String'];
-  type: Scalars['String'];
-};
-
 export type ProductVariant = {
   __typename?: 'ProductVariant';
   id: Scalars['ID'];
@@ -255,6 +241,7 @@ export type ProductVariant = {
   enabled: Scalars['Boolean'];
   sku: Scalars['String'];
   name: Scalars['String'];
+  rating: Scalars['Float'];
   product: Product;
   trackInventory: Scalars['Boolean'];
   asset: ProductVariantAsset;
@@ -265,6 +252,7 @@ export type ProductVariant = {
   stock: Array<StockKeeping>;
   line: Array<OrderItem>;
   carts: Array<CartItem>;
+  reviews: Array<Review>;
 };
 
 export type ProductVariantAsset = {
@@ -357,6 +345,8 @@ export type Cart = {
 export type View = {
   __typename?: 'View';
   id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type BillingAgreementRequest = {
@@ -366,6 +356,21 @@ export type BillingAgreementRequest = {
   updatedAt: Scalars['DateTime'];
   value: Scalars['Float'];
   state: BillingAgreementState;
+};
+
+export type StockKeeping = {
+  __typename?: 'StockKeeping';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  quantity: Scalars['Float'];
+  available_quantity: Scalars['Float'];
+  threshold: Scalars['Float'];
+  multiple: Scalars['Boolean'];
+  backorder: Scalars['Boolean'];
+  stockstatus: Scalars['Boolean'];
+  sku: Scalars['String'];
+  type: Scalars['String'];
 };
 
 export type Zip = {
@@ -489,6 +494,17 @@ export type StockBackLog = {
   quantity: Scalars['Float'];
   variant: ProductVariantPrice;
   store: Store;
+};
+
+export type Review = {
+  __typename?: 'Review';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  stars: Scalars['Int'];
+  text: Scalars['String'];
+  user: User;
+  variant: ProductVariant;
 };
 
 export type Address = {
@@ -1923,17 +1939,20 @@ export type ProductVariantsCountAggregate = {
   enabled?: Maybe<Scalars['Int']>;
   sku?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['Int']>;
+  rating?: Maybe<Scalars['Int']>;
   trackInventory?: Maybe<Scalars['Int']>;
 };
 
 export type ProductVariantsSumAggregate = {
   __typename?: 'ProductVariantsSumAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantsAvgAggregate = {
   __typename?: 'ProductVariantsAvgAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantsMinAggregate = {
@@ -1945,6 +1964,7 @@ export type ProductVariantsMinAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantsMaxAggregate = {
@@ -1956,6 +1976,7 @@ export type ProductVariantsMaxAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductAssetsCountAggregate = {
@@ -1989,17 +2010,20 @@ export type ProductVariantCountAggregate = {
   enabled?: Maybe<Scalars['Int']>;
   sku?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['Int']>;
+  rating?: Maybe<Scalars['Int']>;
   trackInventory?: Maybe<Scalars['Int']>;
 };
 
 export type ProductVariantSumAggregate = {
   __typename?: 'ProductVariantSumAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantAvgAggregate = {
   __typename?: 'ProductVariantAvgAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantMinAggregate = {
@@ -2011,6 +2035,7 @@ export type ProductVariantMinAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantMaxAggregate = {
@@ -2022,6 +2047,7 @@ export type ProductVariantMaxAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductVariantLinesCountAggregate = {
@@ -2217,17 +2243,20 @@ export type ProductOptionVariantsCountAggregate = {
   enabled?: Maybe<Scalars['Int']>;
   sku?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['Int']>;
+  rating?: Maybe<Scalars['Int']>;
   trackInventory?: Maybe<Scalars['Int']>;
 };
 
 export type ProductOptionVariantsSumAggregate = {
   __typename?: 'ProductOptionVariantsSumAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductOptionVariantsAvgAggregate = {
   __typename?: 'ProductOptionVariantsAvgAggregate';
   dum_price?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductOptionVariantsMinAggregate = {
@@ -2239,6 +2268,7 @@ export type ProductOptionVariantsMinAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductOptionVariantsMaxAggregate = {
@@ -2250,6 +2280,7 @@ export type ProductOptionVariantsMaxAggregate = {
   dum_price?: Maybe<Scalars['Float']>;
   sku?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  rating?: Maybe<Scalars['Float']>;
 };
 
 export type ProductOptionGroupCountAggregate = {
@@ -3402,6 +3433,7 @@ export type QueryGetSingleOrderArgs = {
 export type Mutation = {
   __typename?: 'Mutation';
   ShiftProductVariant: ProductVariant;
+  creteReview: Review;
   CreateUser: UserResponse;
   LoginUser: UserResponse;
   UpdateAccountInfo: User;
@@ -3417,6 +3449,13 @@ export type Mutation = {
 export type MutationShiftProductVariantArgs = {
   prodId: Scalars['String'];
   name: Scalars['String'];
+};
+
+
+export type MutationCreteReviewArgs = {
+  stars: Scalars['Float'];
+  varId: Scalars['String'];
+  text: Scalars['String'];
 };
 
 
@@ -3630,6 +3669,21 @@ export type ShiftProductVariantMutation = (
   ) }
 );
 
+export type CreateReviewMutationVariables = Exact<{
+  text: Scalars['String'];
+  stars: Scalars['Float'];
+  varId: Scalars['String'];
+}>;
+
+
+export type CreateReviewMutation = (
+  { __typename?: 'Mutation' }
+  & { creteReview: (
+    { __typename?: 'Review' }
+    & Pick<Review, 'id'>
+  ) }
+);
+
 export type GetMenuQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3672,7 +3726,7 @@ export type GetSingleProductVariantQuery = (
   { __typename?: 'Query' }
   & { getSingleProductVariant: (
     { __typename?: 'ProductVariant' }
-    & Pick<ProductVariant, 'id' | 'name'>
+    & Pick<ProductVariant, 'id' | 'name' | 'rating'>
     & { specs?: Maybe<(
       { __typename?: 'ProductVariantSpecs' }
       & Pick<ProductVariantSpecs, 'id' | 'specs'>
@@ -3728,6 +3782,9 @@ export type GetSingleProductVariantQuery = (
     )>>, seo?: Maybe<(
       { __typename?: 'Seo' }
       & Pick<Seo, 'id' | 'urlKey' | 'metatitle' | 'metadesc' | 'metakeywords'>
+    )>, reviews: Array<(
+      { __typename?: 'Review' }
+      & Pick<Review, 'id' | 'createdAt' | 'stars' | 'text'>
     )> }
   ) }
 );
@@ -3831,7 +3888,7 @@ export type GetProductVariantForCollectionQuery = (
   { __typename?: 'Query' }
   & { GetProductVariantForCollection: Array<(
     { __typename?: 'ProductVariant' }
-    & Pick<ProductVariant, 'id' | 'name'>
+    & Pick<ProductVariant, 'id' | 'name' | 'rating'>
     & { asset: (
       { __typename?: 'ProductVariantAsset' }
       & Pick<ProductVariantAsset, 'id'>
@@ -3903,7 +3960,7 @@ export type GetProductVariantByProductQuery = (
   { __typename?: 'Query' }
   & { getProductVariantByProduct: Array<(
     { __typename?: 'ProductVariant' }
-    & Pick<ProductVariant, 'id' | 'name'>
+    & Pick<ProductVariant, 'id' | 'name' | 'rating'>
     & { product: (
       { __typename?: 'Product' }
       & Pick<Product, 'id' | 'productName'>
@@ -4371,6 +4428,40 @@ export function useShiftProductVariantMutation(baseOptions?: Apollo.MutationHook
 export type ShiftProductVariantMutationHookResult = ReturnType<typeof useShiftProductVariantMutation>;
 export type ShiftProductVariantMutationResult = Apollo.MutationResult<ShiftProductVariantMutation>;
 export type ShiftProductVariantMutationOptions = Apollo.BaseMutationOptions<ShiftProductVariantMutation, ShiftProductVariantMutationVariables>;
+export const CreateReviewDocument = gql`
+    mutation createReview($text: String!, $stars: Float!, $varId: String!) {
+  creteReview(text: $text, stars: $stars, varId: $varId) {
+    id
+  }
+}
+    `;
+export type CreateReviewMutationFn = Apollo.MutationFunction<CreateReviewMutation, CreateReviewMutationVariables>;
+
+/**
+ * __useCreateReviewMutation__
+ *
+ * To run a mutation, you first call `useCreateReviewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReviewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createReviewMutation, { data, loading, error }] = useCreateReviewMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      stars: // value for 'stars'
+ *      varId: // value for 'varId'
+ *   },
+ * });
+ */
+export function useCreateReviewMutation(baseOptions?: Apollo.MutationHookOptions<CreateReviewMutation, CreateReviewMutationVariables>) {
+        return Apollo.useMutation<CreateReviewMutation, CreateReviewMutationVariables>(CreateReviewDocument, baseOptions);
+      }
+export type CreateReviewMutationHookResult = ReturnType<typeof useCreateReviewMutation>;
+export type CreateReviewMutationResult = Apollo.MutationResult<CreateReviewMutation>;
+export type CreateReviewMutationOptions = Apollo.BaseMutationOptions<CreateReviewMutation, CreateReviewMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -4478,6 +4569,7 @@ export const GetSingleProductVariantDocument = gql`
   getSingleProductVariant(id: $id) {
     id
     name
+    rating
     specs {
       id
       specs
@@ -4551,6 +4643,12 @@ export const GetSingleProductVariantDocument = gql`
       metatitle
       metadesc
       metakeywords
+    }
+    reviews {
+      id
+      createdAt
+      stars
+      text
     }
   }
 }
@@ -4787,6 +4885,7 @@ export const GetProductVariantForCollectionDocument = gql`
   GetProductVariantForCollection(id: $id, limit: $limit, search: $search) {
     id
     name
+    rating
     asset {
       id
       asset {
@@ -4945,6 +5044,7 @@ export const GetProductVariantByProductDocument = gql`
   getProductVariantByProduct(id: $id) {
     id
     name
+    rating
     product {
       id
       productName

@@ -78,3 +78,9 @@ mutation ShiftProductVariant($prodId: String!, $name: String!){
     }
 }
 
+mutation createReview($text: String!, $stars: Float!, $varId: String!){
+    creteReview(text: $text, stars: $stars, varId:$varId) {
+        id
+    }
+}
+

@@ -1,12 +1,20 @@
-import React from "react";
-import {GetDefaultStoreDocument, GetMenuDocument, GetSingleOrderDocument, Order, Store} from "../../gql";
+import React, {useState} from "react";
+import {
+    CreateReviewDocument, CreateReviewMutationVariables,
+    GetDefaultStoreDocument,
+    GetMenuDocument,
+    GetSingleOrderDocument,
+    Order,
+    Store
+} from "../../gql";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import Layout from "../../components/Layout";
 import withApollo from "../../utils/withApollo";
 import {DateTime} from "luxon";
 import {CloseCircleFilled, CloseCircleTwoTone, SwitcherTwoTone} from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import {Button, Input, Rate, Tooltip, Popover, message} from "antd";
+import {useMutation} from "@apollo/client";
 
 interface Props {
     id: string,
@@ -15,9 +23,50 @@ interface Props {
     order: any
 }
 
+const {TextArea} = Input
+
 const Orders = ({menu, store, order}: Props) => {
 
-    console.log(order)
+    const [addr, setAddr] = useState(false)
+    const [stars, setStars] = useState(0)
+    const [rev, setRev] = useState('')
+
+    const [CreateReview] = useMutation<any, CreateReviewMutationVariables>(CreateReviewDocument)
+
+    const reviewContetn = (varId) =>  (
+        <React.Fragment>
+            <div style={{width: 450}}>
+                <div>
+                    <span>Rate The Product</span>
+                </div>
+                <Rate  onChange={value => setStars(value)} value={stars} />
+
+                <div>
+                    <span>Write your review</span>
+                </div>
+                <TextArea placeholder={'Your Review ...'} value={rev} onChange={(event) => setRev(event.target.value)}/>
+                <div style={{marginTop: 20}}>
+                    <Button onClick={() => {
+                        CreateReview({
+                            variables: {
+                                varId:  varId,
+                                stars,
+                                text: rev
+                            }
+                        }).then(() => {
+                            message.success('Notification Added')
+                            setAddr(false)
+                            setStars(0)
+                            setRev('')
+                        })
+                            .catch(error => {
+                                message.error(error.message)
+                            })
+                    }}>Add Review</Button>
+                </div>
+            </div>
+        </React.Fragment>
+    )
 
     return (
         <React.Fragment>
@@ -76,9 +125,17 @@ const Orders = ({menu, store, order}: Props) => {
                                                     <Tooltip title="Cancel Order">
                                                         <Button shape="circle" icon={<CloseCircleTwoTone style={{fontSize: 20}}/>} />
                                                     </Tooltip>
-                                                    <Tooltip title="Write Review">
-                                                        <Button shape="circle" style={{marginLeft: 10}} icon={<SwitcherTwoTone style={{fontSize: 20}}/>} />
-                                                    </Tooltip>
+                                                    <Popover
+                                                        content={() => reviewContetn(lines.item.productVariant.id)}
+                                                        title="Add Review"
+                                                        trigger="click"
+                                                        visible={addr}
+                                                        onVisibleChange={visible => setAddr(visible)}
+                                                    >
+                                                        <Tooltip title="Write Review">
+                                                            <Button shape="circle" style={{marginLeft: 10}} onClick={() => setAddr(true)} icon={<SwitcherTwoTone style={{fontSize: 20}}/>} />
+                                                        </Tooltip>
+                                                    </Popover>
                                                 </td>
                                             </tr>
                                         ))}

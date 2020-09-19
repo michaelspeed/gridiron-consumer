@@ -9,18 +9,19 @@ import {
 } from "../../gql";
 import withApollo from "../../utils/withApollo";
 import useScripts from "../../utils/useScript";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {assetsURL} from "../../utils/globalconstants";
 import clsx from "clsx";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import {primary} from "../../utils/colorConfig";
-import {multiSearchOr} from "../../utils/searchConfig";
 import {Button, Card, CardActionArea, CardContent, Drawer, IconButton, TextField, Typography} from "@material-ui/core";
 import ProdPrice from "../../components/Product/ProdPrice";
-import Carousel, { slidesToShowPlugin } from '@brainhubeu/react-carousel';
 import {useMutation, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
+import {Rate} from "antd";
+import {FrownOutlined, MehOutlined, SmileOutlined} from "@ant-design/icons";
+import {DateTime} from "luxon";
 
 // 0237670224
 
@@ -30,6 +31,14 @@ interface Props {
     store: Store
     price: ProductVariantPrice[]
 }
+
+const customIcons = {
+    1: <FrownOutlined />,
+    2: <FrownOutlined />,
+    3: <MehOutlined />,
+    4: <SmileOutlined />,
+    5: <SmileOutlined />,
+};
 
 const SingleProduct = ({menu, variant, store, price}: Props) => {
 
@@ -117,21 +126,15 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                             <div className="product-details-content main-product-details-content">
                                 <h2>{variant.name}</h2>
                                 <div className="product-ratting-review-wrap">
-                                    <div className="product-ratting-digit-wrap">
+                                    <div className="product-ratting-digit-wrap align-items-center">
                                         <div className="product-ratting">
-                                            <i className="icon-rating"></i>
-                                            <i className="icon-rating"></i>
-                                            <i className="icon-rating"></i>
-                                            <i className="icon-rating"></i>
-                                            <i className="icon-star-empty"></i>
+                                            <Rate value={variant.rating} character={({ index }) => {
+                                                return customIcons[index + 1];
+                                            }}/>
                                         </div>
                                         <div className="product-digit">
-                                            <span>4.0</span>
+                                            <span>{variant.rating}</span>
                                         </div>
-                                    </div>
-                                    <div className="product-review-order">
-                                        <span>62 Reviews</span>
-                                        <span>242 orders</span>
                                     </div>
                                 </div>
                                 <div className="pro-details-price">
@@ -237,93 +240,24 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                                 </div>
                                 <div id="des-details3" className="tab-pane">
                                     <div className="review-wrapper">
-                                        <h2>1 review for Sleeve Button Cowl Neck</h2>
-                                        <div className="single-review">
-                                            <div className="review-img">
-                                                <img src="assets/images/product-details/client-1.png" alt=""/>
-                                            </div>
-                                            <div className="review-content">
-                                                <div className="review-top-wrap">
-                                                    <div className="review-name">
-                                                        <h5><span>John Snow</span> - March 14, 2019</h5>
+                                        <h2>Reviews for {variant.name}</h2>
+                                        {variant.reviews.map(rev => (
+                                            <div className="single-review">
+                                                <div className="review-content">
+                                                    <div className="review-top-wrap">
+                                                        <div className="review-name">
+                                                            <h5>{DateTime.fromISO(rev.createdAt).toFormat('DD')}</h5>
+                                                        </div>
                                                     </div>
                                                     <div className="review-rating">
-                                                        <i className="yellow icon-rating"></i>
-                                                        <i className="yellow icon-rating"></i>
-                                                        <i className="yellow icon-rating"></i>
-                                                        <i className="yellow icon-rating"></i>
-                                                        <i className="yellow icon-rating"></i>
+                                                        <Rate value={rev.stars} character={({ index }) => {
+                                                            return customIcons[index + 1];
+                                                        }}/>
                                                     </div>
+                                                    <p>{rev.text}</p>
                                                 </div>
-                                                <p>Donec accumsan auctor iaculis. Sed suscipit arcu ligula, at egestas
-                                                    magna molestie a. Proin ac ex maximus, ultrices justo eget, sodales
-                                                    orci. Aliquam egestas libero ac turpis pharetra, in vehicula lacus
-                                                    scelerisque</p>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className="ratting-form-wrapper">
-                                        <span>Add a Review</span>
-                                        <p>Your email address will not be published. Required fields are
-                                            marked <span>*</span></p>
-                                        <div className="ratting-form">
-                                            <form action="#">
-                                                <div className="row">
-                                                    <div className="col-lg-3 col-md-6">
-                                                        <div className="rating-form-style mb-20">
-                                                            <label>Name <span>*</span></label>
-                                                            <input type="text"/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-3 col-md-6">
-                                                        <div className="rating-form-style mb-20">
-                                                            <label>Email <span>*</span></label>
-                                                            <input type="email"/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-12">
-                                                        <div className="star-box-wrap">
-                                                            <div className="single-ratting-star">
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                            </div>
-                                                            <div className="single-ratting-star">
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                            </div>
-                                                            <div className="single-ratting-star">
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                            </div>
-                                                            <div className="single-ratting-star">
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                            </div>
-                                                            <div className="single-ratting-star">
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                                <a href="#"><i className="icon-rating"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-12">
-                                                        <div className="rating-form-style mb-20">
-                                                            <label>Your review <span>*</span></label>
-                                                            <textarea name="Your Review"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-12">
-                                                        <div className="form-submit">
-                                                            <input type="submit" value="Submit"/>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>

@@ -26,6 +26,7 @@ query getSingleProductVariant($id: ID!){
     getSingleProductVariant(id: $id){
         id
         name
+        rating
         specs {
             id
             specs
@@ -99,6 +100,12 @@ query getSingleProductVariant($id: ID!){
             metatitle
             metadesc
             metakeywords
+        }
+        reviews {
+            id
+            createdAt
+            stars
+            text
         }
     }
 }
@@ -174,6 +181,7 @@ query GetProductVariantForCollection($id: ID!, $limit: Int, $search: String){
     GetProductVariantForCollection(id: $id, limit: $limit, search: $search) {
         id
         name
+        rating
         asset{
             id
             asset{
@@ -251,6 +259,7 @@ query getProductVariantByProduct($id: ID!){
     getProductVariantByProduct(id: $id) {
         id
         name
+        rating
         product {
             id
             productName
