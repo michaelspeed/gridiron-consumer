@@ -3,19 +3,20 @@ import withApollo from "../../utils/withApollo";
 import Layout from "../../components/Layout";
 import React, {useEffect, useState} from "react";
 import {
+    CreateShopOrderDocument, CreateShopOrderMutationVariables,
     GetCurrentUserDocument,
     GetCurrentUserQueryVariables,
     GetDefaultStoreDocument,
     GetMenuDocument, GetPaymentCodesDocument, GetPaymentCodesQueryVariables
 } from "../../gql";
-import {initializeStore, useStore} from "../../store/store";
+import {CartSSD, initializeStore, useStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import {assetsURL} from "../../utils/globalconstants";
 import {Button} from "antd";
 import {MinusOutlined, PlusOutlined} from "@ant-design/icons";
 import {observer} from "mobx-react";
 import {useRouter} from "next/router";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import Loader from "../../components/Loader/Loader";
 import {Grow} from "@material-ui/core";
 
@@ -39,6 +40,8 @@ const Checkout = ({menu, store}: Props) => {
 
     const navig = useRouter()
 
+    const {ResetCart} = useStore()
+
     const [pageState, setPageState] = useState(1)
     const [paymentMode, setPaymentMode] = useState(1)
     const [address, setAddress] = useState('')
@@ -50,6 +53,14 @@ const Checkout = ({menu, store}: Props) => {
     const {data, error, ...addLoad} = useQuery<any, GetCurrentUserQueryVariables>(GetCurrentUserDocument)
     const {...payCode} = useQuery<any, GetPaymentCodesQueryVariables>(GetPaymentCodesDocument)
 
+    const [CreateOrder] = useMutation<any, CreateShopOrderMutationVariables>(CreateShopOrderDocument, {
+        variables:{
+            address,
+            transaction: transId === '' ? undefined : transId,
+            orderLineDto: cart.map(item => ({priceId: item.price.id, quantity: item.quantity}))
+        }
+    })
+
     const getTotalAmount = () => {
         let amount = 0
         for (let prod of cart) {
@@ -59,22 +70,14 @@ const Checkout = ({menu, store}: Props) => {
     }
 
     useEffect(() => {
-        if (pageState === 4 && paymentMode === 2 && payCode.data) {
-            const opts = {
-                key: payCode.data.getPaymentCodes.api,
-                protocol: 'https',
-                hostname: 'api.razorpay.com',
-                amount: getTotalAmount() * 100,
-                name: store.storeName,
-                theme: {
-                    color: '#333'
-                },
-                handler: (transaction) => {
-                    console.log(transaction)
-                }
-            }
-            const razor = window.Razorpay(opts)
-            razor.open()
+        if (pageState === 4) {
+            CreateOrder().then(value => {
+                localStorage.removeItem(CartSSD)
+                ResetCart()
+                navig.push(`/success/${value.data.createShopOrder.id}`)
+            }).catch(error => {
+                console.log(error)
+            })
         }
     }, [pageState, paymentMode])
 
@@ -196,23 +199,35 @@ const Checkout = ({menu, store}: Props) => {
                                 </div>
                                 <React.Fragment>
                                     {pageState === 3 && <div className="cart-table-content">
-                                        <div className='d-flex justify-content-between align-items-center'>
-                                            <h3>Cash On Delivery</h3>
-                                            <a href="javascript:;" className="btn-hover btn btn-primary cart-btn-style"
-                                               onClick={() => {
-                                                   setPaymentMode(1)
-                                                   setPageState(4)
-                                               }}
-                                            >Select Address</a>
-                                        </div>
-                                        <div className='d-flex justify-content-between align-items-center'>
-                                            <h3>Pay Now</h3>
-                                            <a href="javascript:;" className="btn-hover btn btn-primary cart-btn-style"
-                                               onClick={() => {
-                                                   setPaymentMode(2)
-                                                   setPageState(4)
-                                               }}
-                                            >Select Address</a>
+                                        <div className='row'>
+                                            <div className='col-md-6 d-flex justify-content-center align-items-center'>
+                                                <a href="javascript:;" className="btn-hover btn cart-btn-style"
+                                                   onClick={() => {
+                                                       setPageState(4)
+                                                   }}
+                                                ><h3>Cash On Delivery</h3></a>
+                                            </div>
+                                            <div className='col-md-6 d-flex justify-content-center align-items-center'>
+                                                <a href="javascript:;" className="btn-hover btn cart-btn-style"
+                                                   onClick={() => {
+                                                       const opts = {
+                                                           key: payCode.data.getPaymentCodes.api,
+                                                           amount: getTotalAmount() * 100,
+                                                           name: store.storeName,
+                                                           theme: {
+                                                               color: '#333'
+                                                           },
+                                                           handler: (transaction: IRaxor) => {
+                                                               console.log(transaction)
+                                                               setTransId(transaction.razorpay_payment_id)
+                                                               setPageState(4)
+                                                           }
+                                                       }
+                                                       const razor = window.Razorpay(opts)
+                                                       razor.open()
+                                                   }}
+                                                ><h3>Pay Now</h3></a>
+                                            </div>
                                         </div>
                                     </div>}
                                 </React.Fragment>
@@ -223,6 +238,9 @@ const Checkout = ({menu, store}: Props) => {
                                     {pageState === 4 && <div className="cart-table-content">
                                         <div className='d-flex justify-content-center align-items-center'>
                                             <Loader/>
+                                        </div>
+                                        <div className='d-flex justify-content-center align-items-center'>
+                                            <span>Processing Order ...</span>
                                         </div>
                                     </div>}
                                 </React.Fragment>

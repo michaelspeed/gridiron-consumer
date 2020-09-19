@@ -97,6 +97,9 @@ const Store = types
                 self.cart[index].quantity = self.cart[index].quantity - 1
             }
         }
+        const ResetCart = () => {
+            self.cart.splice(0, self.cart.length)
+        }
         return {
             setStoreLogin,
             setQuickView,
@@ -107,7 +110,8 @@ const Store = types
             RemoveFromCart,
             loadCart,
             AddQuantity,
-            RemoveQuantity
+            RemoveQuantity,
+            ResetCart
         }
     })
 

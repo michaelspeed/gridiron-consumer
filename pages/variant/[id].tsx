@@ -30,6 +30,14 @@ const VariantSingle = ({menu, store, variant, prod}: Props) => {
 
     const navig = useRouter()
 
+    const getPrice = (variant: ProductVariant) => {
+        let lowPrice = 0
+        if (variant.price!.length > 0) {
+            lowPrice = variant.price![0].price
+        }
+        return lowPrice
+    }
+
     return (
         <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
             <div className="breadcrumb-area breadcrumb-mt bg-gray breadcrumb-ptb-1" style={{marginTop: 130}}>
@@ -54,16 +62,16 @@ const VariantSingle = ({menu, store, variant, prod}: Props) => {
                                         <div className="product-content">
                                             <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                             <div className="product-price">
-                                                <span>$ 124</span>
-                                                <span className="old-price">$ 130</span>
+                                                <span>{getPrice(variant) === 0 ? 'Unavailable': `₹ ${getPrice(variant)}`}</span>
+                                                {/*<span className="old-price">$ 130</span>*/}
                                             </div>
                                         </div>
                                         <div className="product-action-position-1 text-center">
                                             <div className="product-content">
                                                 <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                                 <div className="product-price">
-                                                    <span>$ 124</span>
-                                                    <span className="old-price">$ 130</span>
+                                                    <span>{getPrice(variant) === 0 ? 'Unavailable': `₹ ${getPrice(variant)}`}</span>
+                                                    {/*<span className="old-price">$ 130</span>*/}
                                                 </div>
                                             </div>
                                             <div className="product-action-wrap">

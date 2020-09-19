@@ -351,3 +351,49 @@ query getPaymentCodes {
         api
     }
 }
+
+query getMyOrders {
+    getMyOrders {
+        id
+        address
+        createdAt
+        totalPrice
+        mode
+        line {
+            id
+            item {
+                productVariant{
+                    id
+                    name
+                }
+            }
+        }
+    }
+}
+
+query getSingleOrder($id: ID!){
+    getSingleOrder(id: $id) {
+        id
+        address
+        createdAt
+        totalPrice
+        mode
+        line {
+            id
+            stage
+            priceField
+            store {
+                id
+                storeName
+            }
+            item {
+                id
+                productVariant{
+                    id
+                    name
+                }
+                quantity
+            }
+        }
+    }
+}

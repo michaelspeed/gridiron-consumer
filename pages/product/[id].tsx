@@ -5,7 +5,7 @@ import {
     GetHomePageDocument,
     GetMenuDocument,
     GetSingleProductVariantDocument,
-    ProductVariant, ProductVariantPrice, SingProductPriceDocument, Store
+    ProductVariant, ProductVariantPrice, ShiftProductVariantDocument, SingProductPriceDocument, Store
 } from "../../gql";
 import withApollo from "../../utils/withApollo";
 import useScripts from "../../utils/useScript";
@@ -19,6 +19,8 @@ import {multiSearchOr} from "../../utils/searchConfig";
 import {Button, Card, CardActionArea, CardContent, Drawer, IconButton, TextField, Typography} from "@material-ui/core";
 import ProdPrice from "../../components/Product/ProdPrice";
 import Carousel, { slidesToShowPlugin } from '@brainhubeu/react-carousel';
+import {useMutation, useQuery} from "@apollo/client";
+import {useRouter} from "next/router";
 
 // 0237670224
 
@@ -36,6 +38,10 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
     const [check, setCheck] = useState(false)
     const [pincode, setPincode] = useState('')
 
+    const navig = useRouter()
+
+    const [SplitName] = useMutation(ShiftProductVariantDocument)
+
     useEffect(() => {
         let newallasset: any = []
         if(variant.asset) {
@@ -52,7 +58,9 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
     useScripts('/js/main.js')
 
     const optColor = (name) => {
-        if (variant.name.replace(/[^a-zA-Z0-9 ]/gi, '').split(" ").indexOf(name) > -1) {
+        const namesplit = name.split(" ")
+        const varsplit = variant.name.replace(/[^a-zA-Z0-9 ]/gi, '').split(" ")
+        if (!namesplit.every(elm => varsplit.includes(elm))) {
             return {
                 back: '#FFFFFF',
                 color: '#000000'
@@ -140,7 +148,19 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                                             <ul>
                                                 {item.options.map(opt => (
                                                     <li style={{backgroundColor: optColor(opt.code).back}} key={opt.id}>
-                                                        <a href="#" style={{width: "inherit", paddingLeft: 5, paddingRight: 5, color: optColor(opt.code).color}}>{opt.name}</a>
+                                                        <a href="javascript:;"
+                                                           onClick={() => {
+                                                               SplitName({
+                                                                   variables: {
+                                                                       prodId: variant.product.id,
+                                                                       name: opt.code
+                                                                   }
+                                                               })
+                                                                   .then(value => {
+                                                                       navig.push(`/product/${value.data.ShiftProductVariant.id}`)
+                                                                   })
+                                                           }}
+                                                           style={{width: "inherit", paddingLeft: 5, paddingRight: 5, color: optColor(opt.code).color}}>{opt.name}</a>
                                                     </li>
                                                 ))}
                                             </ul>

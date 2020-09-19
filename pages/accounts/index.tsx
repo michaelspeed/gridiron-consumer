@@ -9,6 +9,7 @@ import ProfileInfo from "../../components/Account/ProfileInfo";
 import clsx from "clsx";
 import {useRouter} from "next/router";
 import AddressInfo from "../../components/Account/AdressesInfo";
+import OrdersInfo from "../../components/Account/OrdersInfo";
 
 interface Props {
     menu: any,
@@ -32,6 +33,7 @@ const AccountPage = ({menu, store, query}: Props) => {
                         <div className="col-lg-9">
                             {query === 'profile' && <ProfileInfo/>}
                             {query === 'address' && <AddressInfo/>}
+                            {query === 'orders' && <OrdersInfo/>}
                         </div>
                         <div className="col-lg-3">
                             {user && <div className="shop-sidebar-style" style={{marginBottom: 30}}>

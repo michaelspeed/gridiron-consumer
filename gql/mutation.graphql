@@ -62,11 +62,19 @@ mutation RemoveCartItem($cartId: ID!){
     }
 }
 
-mutation createShopOrder($orderLineDto: [CartItemDto!]!, $address: String!){
+mutation createShopOrder($address: String!, $transaction: String, $orderLineDto: [CartItemDto!]!){
     createShopOrder(
-        orderLineDto: $orderLineDto,
-        address: $address
+        address: $address,
+        transaction: $transaction,
+        orderLineDto: $orderLineDto
     ) {
         id
     }
 }
+
+mutation ShiftProductVariant($prodId: String!, $name: String!){
+    ShiftProductVariant(prodId: $prodId, name: $name) {
+        id
+    }
+}
+

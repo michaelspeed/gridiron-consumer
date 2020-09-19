@@ -97,6 +97,8 @@ export type Order = {
   updatedAt: Scalars['DateTime'];
   totalPrice: Scalars['Float'];
   address: Scalars['String'];
+  mode: Scalars['String'];
+  line: Array<OrderLine>;
 };
 
 export type OrderItem = {
@@ -105,6 +107,7 @@ export type OrderItem = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   quantity: Scalars['Float'];
+  productVariant: ProductVariant;
 };
 
 export type OrderLine = {
@@ -114,6 +117,8 @@ export type OrderLine = {
   updatedAt: Scalars['DateTime'];
   priceField: Scalars['JSON'];
   stage: Scalars['String'];
+  item: OrderItem;
+  store: Store;
 };
 
 
@@ -196,6 +201,7 @@ export type Store = {
   type: StoreTypeEnum;
   vendor?: Maybe<Vendor>;
   cart: Array<CartItem>;
+  backlogs: StockBackLog;
 };
 
 export enum StoreTypeEnum {
@@ -282,6 +288,7 @@ export type ProductVariantPrice = {
   store?: Maybe<Store>;
   promoprice?: Maybe<PromotionVariantPrice>;
   cartItem?: Maybe<CartItem>;
+  backlog?: Maybe<StockBackLog>;
 };
 
 export type ProductOption = {
@@ -472,6 +479,16 @@ export type CartItem = {
   variant: ProductVariant;
   store: Store;
   price: ProductVariantPrice;
+};
+
+export type StockBackLog = {
+  __typename?: 'StockBackLog';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  quantity: Scalars['Float'];
+  variant: ProductVariantPrice;
+  store: Store;
 };
 
 export type Address = {
@@ -863,28 +880,53 @@ export type StoreMaxAggregate = {
   GSTIN?: Maybe<Scalars['String']>;
 };
 
-export type StoreLinesCountAggregate = {
-  __typename?: 'StoreLinesCountAggregate';
+export type StoreBacklogsCountAggregate = {
+  __typename?: 'StoreBacklogsCountAggregate';
   id?: Maybe<Scalars['Int']>;
   createdAt?: Maybe<Scalars['Int']>;
   updatedAt?: Maybe<Scalars['Int']>;
-  stage?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int']>;
 };
 
-export type StoreLinesMinAggregate = {
-  __typename?: 'StoreLinesMinAggregate';
+export type StoreBacklogsSumAggregate = {
+  __typename?: 'StoreBacklogsSumAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type StoreBacklogsAvgAggregate = {
+  __typename?: 'StoreBacklogsAvgAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type StoreBacklogsMinAggregate = {
+  __typename?: 'StoreBacklogsMinAggregate';
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  stage?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Float']>;
 };
 
-export type StoreLinesMaxAggregate = {
-  __typename?: 'StoreLinesMaxAggregate';
+export type StoreBacklogsMaxAggregate = {
+  __typename?: 'StoreBacklogsMaxAggregate';
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  stage?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type StoreCartsCountAggregate = {
+  __typename?: 'StoreCartsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+};
+
+export type StoreCartsMinAggregate = {
+  __typename?: 'StoreCartsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+};
+
+export type StoreCartsMaxAggregate = {
+  __typename?: 'StoreCartsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
 };
 
 export type StorePricesCountAggregate = {
@@ -2299,6 +2341,40 @@ export type ProductVariantPriceMaxAggregate = {
   price?: Maybe<Scalars['Float']>;
 };
 
+export type ProductVariantPriceBacklogsCountAggregate = {
+  __typename?: 'ProductVariantPriceBacklogsCountAggregate';
+  id?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['Int']>;
+  updatedAt?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int']>;
+};
+
+export type ProductVariantPriceBacklogsSumAggregate = {
+  __typename?: 'ProductVariantPriceBacklogsSumAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantPriceBacklogsAvgAggregate = {
+  __typename?: 'ProductVariantPriceBacklogsAvgAggregate';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantPriceBacklogsMinAggregate = {
+  __typename?: 'ProductVariantPriceBacklogsMinAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+export type ProductVariantPriceBacklogsMaxAggregate = {
+  __typename?: 'ProductVariantPriceBacklogsMaxAggregate';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  quantity?: Maybe<Scalars['Float']>;
+};
+
 export type ProductVariantAssetCountAggregate = {
   __typename?: 'ProductVariantAssetCountAggregate';
   id?: Maybe<Scalars['Int']>;
@@ -3253,6 +3329,8 @@ export type Query = {
   queryFacet: Array<Product>;
   GetCart: Cart;
   getPaymentCodes: PaymentMethod;
+  getMyOrders: Array<Order>;
+  getSingleOrder: Order;
 };
 
 
@@ -3316,8 +3394,14 @@ export type QueryGetCartArgs = {
   id: Scalars['ID'];
 };
 
+
+export type QueryGetSingleOrderArgs = {
+  id: Scalars['ID'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  ShiftProductVariant: ProductVariant;
   CreateUser: UserResponse;
   LoginUser: UserResponse;
   UpdateAccountInfo: User;
@@ -3327,6 +3411,12 @@ export type Mutation = {
   addToCart: CartItem;
   removeCartItem: CartItem;
   createShopOrder: Order;
+};
+
+
+export type MutationShiftProductVariantArgs = {
+  prodId: Scalars['String'];
+  name: Scalars['String'];
 };
 
 
@@ -3397,6 +3487,7 @@ export type MutationRemoveCartItemArgs = {
 
 
 export type MutationCreateShopOrderArgs = {
+  transaction?: Maybe<Scalars['String']>;
   orderLineDto: Array<CartItemDto>;
   address: Scalars['String'];
 };
@@ -3511,8 +3602,9 @@ export type RemoveCartItemMutation = (
 );
 
 export type CreateShopOrderMutationVariables = Exact<{
-  orderLineDto: Array<CartItemDto>;
   address: Scalars['String'];
+  transaction?: Maybe<Scalars['String']>;
+  orderLineDto: Array<CartItemDto>;
 }>;
 
 
@@ -3521,6 +3613,20 @@ export type CreateShopOrderMutation = (
   & { createShopOrder: (
     { __typename?: 'Order' }
     & Pick<Order, 'id'>
+  ) }
+);
+
+export type ShiftProductVariantMutationVariables = Exact<{
+  prodId: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type ShiftProductVariantMutation = (
+  { __typename?: 'Mutation' }
+  & { ShiftProductVariant: (
+    { __typename?: 'ProductVariant' }
+    & Pick<ProductVariant, 'id'>
   ) }
 );
 
@@ -3918,6 +4024,56 @@ export type GetPaymentCodesQuery = (
   ) }
 );
 
+export type GetMyOrdersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyOrdersQuery = (
+  { __typename?: 'Query' }
+  & { getMyOrders: Array<(
+    { __typename?: 'Order' }
+    & Pick<Order, 'id' | 'address' | 'createdAt' | 'totalPrice' | 'mode'>
+    & { line: Array<(
+      { __typename?: 'OrderLine' }
+      & Pick<OrderLine, 'id'>
+      & { item: (
+        { __typename?: 'OrderItem' }
+        & { productVariant: (
+          { __typename?: 'ProductVariant' }
+          & Pick<ProductVariant, 'id' | 'name'>
+        ) }
+      ) }
+    )> }
+  )> }
+);
+
+export type GetSingleOrderQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetSingleOrderQuery = (
+  { __typename?: 'Query' }
+  & { getSingleOrder: (
+    { __typename?: 'Order' }
+    & Pick<Order, 'id' | 'address' | 'createdAt' | 'totalPrice' | 'mode'>
+    & { line: Array<(
+      { __typename?: 'OrderLine' }
+      & Pick<OrderLine, 'id' | 'stage' | 'priceField'>
+      & { store: (
+        { __typename?: 'Store' }
+        & Pick<Store, 'id' | 'storeName'>
+      ), item: (
+        { __typename?: 'OrderItem' }
+        & Pick<OrderItem, 'id' | 'quantity'>
+        & { productVariant: (
+          { __typename?: 'ProductVariant' }
+          & Pick<ProductVariant, 'id' | 'name'>
+        ) }
+      ) }
+    )> }
+  ) }
+);
+
 
 export const LoginUserDocument = gql`
     mutation LoginUser($email: String!, $password: String!) {
@@ -4149,8 +4305,8 @@ export type RemoveCartItemMutationHookResult = ReturnType<typeof useRemoveCartIt
 export type RemoveCartItemMutationResult = Apollo.MutationResult<RemoveCartItemMutation>;
 export type RemoveCartItemMutationOptions = Apollo.BaseMutationOptions<RemoveCartItemMutation, RemoveCartItemMutationVariables>;
 export const CreateShopOrderDocument = gql`
-    mutation createShopOrder($orderLineDto: [CartItemDto!]!, $address: String!) {
-  createShopOrder(orderLineDto: $orderLineDto, address: $address) {
+    mutation createShopOrder($address: String!, $transaction: String, $orderLineDto: [CartItemDto!]!) {
+  createShopOrder(address: $address, transaction: $transaction, orderLineDto: $orderLineDto) {
     id
   }
 }
@@ -4170,8 +4326,9 @@ export type CreateShopOrderMutationFn = Apollo.MutationFunction<CreateShopOrderM
  * @example
  * const [createShopOrderMutation, { data, loading, error }] = useCreateShopOrderMutation({
  *   variables: {
- *      orderLineDto: // value for 'orderLineDto'
  *      address: // value for 'address'
+ *      transaction: // value for 'transaction'
+ *      orderLineDto: // value for 'orderLineDto'
  *   },
  * });
  */
@@ -4181,6 +4338,39 @@ export function useCreateShopOrderMutation(baseOptions?: Apollo.MutationHookOpti
 export type CreateShopOrderMutationHookResult = ReturnType<typeof useCreateShopOrderMutation>;
 export type CreateShopOrderMutationResult = Apollo.MutationResult<CreateShopOrderMutation>;
 export type CreateShopOrderMutationOptions = Apollo.BaseMutationOptions<CreateShopOrderMutation, CreateShopOrderMutationVariables>;
+export const ShiftProductVariantDocument = gql`
+    mutation ShiftProductVariant($prodId: String!, $name: String!) {
+  ShiftProductVariant(prodId: $prodId, name: $name) {
+    id
+  }
+}
+    `;
+export type ShiftProductVariantMutationFn = Apollo.MutationFunction<ShiftProductVariantMutation, ShiftProductVariantMutationVariables>;
+
+/**
+ * __useShiftProductVariantMutation__
+ *
+ * To run a mutation, you first call `useShiftProductVariantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useShiftProductVariantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [shiftProductVariantMutation, { data, loading, error }] = useShiftProductVariantMutation({
+ *   variables: {
+ *      prodId: // value for 'prodId'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useShiftProductVariantMutation(baseOptions?: Apollo.MutationHookOptions<ShiftProductVariantMutation, ShiftProductVariantMutationVariables>) {
+        return Apollo.useMutation<ShiftProductVariantMutation, ShiftProductVariantMutationVariables>(ShiftProductVariantDocument, baseOptions);
+      }
+export type ShiftProductVariantMutationHookResult = ReturnType<typeof useShiftProductVariantMutation>;
+export type ShiftProductVariantMutationResult = Apollo.MutationResult<ShiftProductVariantMutation>;
+export type ShiftProductVariantMutationOptions = Apollo.BaseMutationOptions<ShiftProductVariantMutation, ShiftProductVariantMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -5019,3 +5209,102 @@ export function useGetPaymentCodesLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GetPaymentCodesQueryHookResult = ReturnType<typeof useGetPaymentCodesQuery>;
 export type GetPaymentCodesLazyQueryHookResult = ReturnType<typeof useGetPaymentCodesLazyQuery>;
 export type GetPaymentCodesQueryResult = Apollo.QueryResult<GetPaymentCodesQuery, GetPaymentCodesQueryVariables>;
+export const GetMyOrdersDocument = gql`
+    query getMyOrders {
+  getMyOrders {
+    id
+    address
+    createdAt
+    totalPrice
+    mode
+    line {
+      id
+      item {
+        productVariant {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMyOrdersQuery__
+ *
+ * To run a query within a React component, call `useGetMyOrdersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyOrdersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyOrdersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyOrdersQuery(baseOptions?: Apollo.QueryHookOptions<GetMyOrdersQuery, GetMyOrdersQueryVariables>) {
+        return Apollo.useQuery<GetMyOrdersQuery, GetMyOrdersQueryVariables>(GetMyOrdersDocument, baseOptions);
+      }
+export function useGetMyOrdersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyOrdersQuery, GetMyOrdersQueryVariables>) {
+          return Apollo.useLazyQuery<GetMyOrdersQuery, GetMyOrdersQueryVariables>(GetMyOrdersDocument, baseOptions);
+        }
+export type GetMyOrdersQueryHookResult = ReturnType<typeof useGetMyOrdersQuery>;
+export type GetMyOrdersLazyQueryHookResult = ReturnType<typeof useGetMyOrdersLazyQuery>;
+export type GetMyOrdersQueryResult = Apollo.QueryResult<GetMyOrdersQuery, GetMyOrdersQueryVariables>;
+export const GetSingleOrderDocument = gql`
+    query getSingleOrder($id: ID!) {
+  getSingleOrder(id: $id) {
+    id
+    address
+    createdAt
+    totalPrice
+    mode
+    line {
+      id
+      stage
+      priceField
+      store {
+        id
+        storeName
+      }
+      item {
+        id
+        productVariant {
+          id
+          name
+        }
+        quantity
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSingleOrderQuery__
+ *
+ * To run a query within a React component, call `useGetSingleOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSingleOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSingleOrderQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetSingleOrderQuery(baseOptions?: Apollo.QueryHookOptions<GetSingleOrderQuery, GetSingleOrderQueryVariables>) {
+        return Apollo.useQuery<GetSingleOrderQuery, GetSingleOrderQueryVariables>(GetSingleOrderDocument, baseOptions);
+      }
+export function useGetSingleOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSingleOrderQuery, GetSingleOrderQueryVariables>) {
+          return Apollo.useLazyQuery<GetSingleOrderQuery, GetSingleOrderQueryVariables>(GetSingleOrderDocument, baseOptions);
+        }
+export type GetSingleOrderQueryHookResult = ReturnType<typeof useGetSingleOrderQuery>;
+export type GetSingleOrderLazyQueryHookResult = ReturnType<typeof useGetSingleOrderLazyQuery>;
+export type GetSingleOrderQueryResult = Apollo.QueryResult<GetSingleOrderQuery, GetSingleOrderQueryVariables>;
