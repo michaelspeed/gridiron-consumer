@@ -39,6 +39,7 @@ export default class MyDocument extends Document<any> {
                     <link rel="stylesheet" href="/css/plugins/jquery-ui.css"/>
                     <link rel="stylesheet" href="/css/plugins/carousel.css"/>
                     <link rel="stylesheet" href="/css/style.css"/>
+                    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;700&display=swap" rel="stylesheet"/>
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
                     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
                     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"

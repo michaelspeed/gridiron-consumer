@@ -182,6 +182,10 @@ query GetProductVariantForCollection($id: ID!, $limit: Int, $search: String){
         id
         name
         rating
+        price {
+            id
+            price
+        }
         asset{
             id
             asset{
@@ -403,6 +407,18 @@ query getSingleOrder($id: ID!){
                 }
                 quantity
             }
+        }
+    }
+}
+
+query GetFacetDocument($id:ID!){
+    GetFacetDocument(id: $id){
+        id
+        code
+        facet {
+            id
+            name
+            code
         }
     }
 }

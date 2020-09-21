@@ -7,7 +7,11 @@ export function getCollectionRoute(link: string) {
 }
 
 export function getFacetRoute(link: string, coll?) {
-    return `/facet/${link}?coll=${coll}`
+    if (coll) {
+        return `/facet/${link}?coll=${coll}`
+    } else {
+        return `/facet/${link}`
+    }
 }
 
 export function getVariantRoute(link: string) {

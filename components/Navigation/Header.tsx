@@ -8,9 +8,9 @@ import {
     Store
 } from "../../gql";
 import {useMutation, useQuery} from "@apollo/client";
-import {Button, Dropdown, Input, Menu, message, Modal} from "antd";
+import {Button, Divider, Dropdown, Input, Menu, message, Modal, Popover} from "antd";
 import {useRouter, withRouter} from "next/router";
-import {primary} from "../../utils/colorConfig";
+import {danger, primary} from "../../utils/colorConfig";
 import {GridIronConstants} from "../../utils/globalconstants";
 import {observer} from "mobx-react";
 import {useStore} from "../../store/store";
@@ -18,6 +18,8 @@ import { UserOutlined } from '@ant-design/icons';
 import {getCollectionRoute, getFacetRoute} from "../../utils/routingUtils";
 import Cookies from 'js-cookie'
 import CardSideBar from "../Cart/CartSideBar";
+import clsx from "clsx";
+import {Drawer} from "@material-ui/core";
 
 interface Props {
     menu: string,
@@ -30,7 +32,7 @@ const Header = observer(({menu, store}: Props) => {
 
     const [menuTree, setMenuTree] = useState<any[]>([])
 
-    const {setStoreLogin, user, setStoreLogout} = useStore()
+    const {setStoreLogin, user, setStoreLogout, TriggerCart, mobileMenu, TriggerMobileMenu} = useStore()
 
     const {...coltree} = useQuery(GetCollectionTreeDocument)
 
@@ -87,12 +89,15 @@ const Header = observer(({menu, store}: Props) => {
     })
 
     useEffect(() => {
+        console.log(JSON.parse(menu))
         setMenuTree(JSON.parse(menu))
     }, [menu])
 
     const ClickMenuItem = (item) => {
         if (item.target === 'COLLECTION') {
             navig.push(getCollectionRoute(item.targetId))
+        } else if (item.target === 'FACET') {
+            navig.push(getFacetRoute(item.targetId))
         }
     }
 
@@ -135,33 +140,81 @@ const Header = observer(({menu, store}: Props) => {
                                         <div className="logo">
                                             <a href="javascript:;" onClick={() => navig.push('/')} style={{textDecoration: "none"}}>
                                                 {/*<img src="/images/logo/logo-2.png" alt="logo"/>*/}
-                                                <h2 style={{color: primary}}>{store.storeName}</h2>
+                                                <h2 style={{color: primary, fontFamily: 'Kumbh Sans', fontWeight: 700}}>{store.storeName}</h2>
                                             </a>
                                         </div>
                                         <div className="main-menu menu-lh-1 main-menu-padding-1 menu-mrg-1">
                                             <nav>
                                                 <ul>
-                                                    {menuTree.map((item: any) => (
-                                                        <li>
-                                                            <a href="javascript:;" onClick={() => ClickMenuItem(item)}>{item.title}</a>
-                                                            <ul className="mega-menu-style-1 mega-menu-width1 menu-negative-mrg1" style={{backgroundColor: primary}}>
-                                                                {item.children !== undefined && item.children.length > 0
-                                                                && item.children.map((child) => {
-                                                                    return (
-                                                                        <li className="">
-                                                                            <a className="menu-title" href="javascript:;" onClick={() => ClickFacetItem(child, item)}>{child.title}</a>
-                                                                            <ul>
-                                                                                {child.children !== undefined && child.children.length > 0
-                                                                                && child.children.map((lilMenu) => (
-                                                                                    <li><a href="javascript:;" onClick={() => ClickFacetItem(lilMenu, child)}>{lilMenu.title}</a></li>
-                                                                                ))}
-                                                                            </ul>
-                                                                        </li>
-                                                                    )
-                                                                })}
-                                                            </ul>
-                                                        </li>
-                                                    ))}
+                                                    {menuTree.map((item: any) => {
+                                                        if (item.target === "FACET") {
+                                                            return (
+                                                                <li>
+                                                                    <a href="javascript:;" style={{fontFamily: 'Kumbh Sans'}} onClick={() => ClickMenuItem(item)}>{item.title}</a>
+                                                                </li>
+                                                            )
+                                                        }
+                                                        if (item.target === 'COLLECTION' && item.children && item.children.length === 0) {
+                                                            return (
+                                                                <li>
+                                                                    <a href="javascript:;" style={{fontFamily: 'Kumbh Sans'}} onClick={() => ClickMenuItem(item)}>{item.title}</a>
+                                                                </li>
+                                                            )
+                                                        }
+                                                        if (item.target === 'COLLECTION' && item.children && item.children.length > 0) {
+                                                            return (
+                                                                <Popover content={() => (
+                                                                    <React.Fragment>
+                                                                        <Menu mode="inline">
+                                                                            {item.children.map((child, index) => {
+                                                                                if (child.children !== undefined && child.children.length > 0) {
+                                                                                    return  (
+                                                                                        <SubMenu
+                                                                                            key="sub1"
+                                                                                            title={child.title}
+                                                                                            style={{fontFamily: 'Kumbh Sans'}}
+                                                                                        >
+                                                                                            {child.children.map((lilMenu, ind) => (
+                                                                                                <Menu.Item key={ind} style={{fontFamily: 'Kumbh Sans'}} onClick={() => ClickFacetItem(lilMenu, child)}>{child.title}</Menu.Item>
+                                                                                            ))}
+                                                                                        </SubMenu>
+                                                                                    )
+                                                                                }
+                                                                                return (
+                                                                                    <Menu.Item key={index} style={{fontFamily: 'Kumbh Sans'}} onClick={() => ClickMenuItem(child)}>{child.title}</Menu.Item>
+                                                                                )
+                                                                            })}
+                                                                        </Menu>
+                                                                    </React.Fragment>
+                                                                )} title={null}>
+                                                                    <li>
+                                                                        <a href="javascript:;" style={{fontFamily: 'Kumbh Sans'}} onClick={() => ClickMenuItem(item)}>{item.title}</a>
+                                                                    </li>
+                                                                </Popover>
+                                                            )
+                                                        }
+                                                        return (
+                                                            <li>
+                                                                <a href="javascript:;" onClick={() => ClickMenuItem(item)}>{item.title}</a>
+                                                                <ul className="mega-menu-style-1 mega-menu-width1 menu-negative-mrg1" style={{backgroundColor: primary}}>
+                                                                    {item.children !== undefined && item.children.length > 0
+                                                                    && item.children.map((child) => {
+                                                                        return (
+                                                                            <li className="">
+                                                                                <a className="menu-title" href="javascript:;" onClick={() => ClickFacetItem(child, item)}>{child.title}</a>
+                                                                                <ul>
+                                                                                    {child.children !== undefined && child.children.length > 0
+                                                                                    && child.children.map((lilMenu) => (
+                                                                                        <li><a href="javascript:;" onClick={() => ClickFacetItem(lilMenu, child)}>{lilMenu.title}</a></li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </li>
+                                                                        )
+                                                                    })}
+                                                                </ul>
+                                                            </li>
+                                                        )
+                                                    })}
                                                 </ul>
                                             </nav>
                                         </div>
@@ -219,14 +272,14 @@ const Header = observer(({menu, store}: Props) => {
                                                            placeholder="Type to search (Ex: Phone, Laptop)"
                                                            type="search"/>
                                                     <button>
-                                                        <i className="icofont-search-1"></i>
+                                                        <i className="fas fa-search"></i>
                                                     </button>
                                                 </div>
                                             </form>
                                         </div>
                                         <div className="same-style header-cart">
-                                            <a className="cart-active" href="#">
-                                                <i className="icofont-shopping-cart"></i>
+                                            <a className="" href="javascript:;" onClick={() => TriggerCart()}>
+                                                <i className="fas fa-shopping-cart"></i>
                                             </a>
                                         </div>
                                         {user && <div className="same-style header-cart ml-5">
@@ -247,13 +300,16 @@ const Header = observer(({menu, store}: Props) => {
                                                             My Addresses
                                                         </a>
                                                     </Menu.Item>
-                                                    <Menu.Item danger onClick={() => setStoreLogout()}>
+                                                    <Menu.Item danger onClick={() => {
+                                                        setStoreLogout()
+                                                        Cookies.remove(GridIronConstants)
+                                                    }}>
                                                         Logout
                                                     </Menu.Item>
                                                 </Menu>
                                             )}>
                                                 <a onClick={e => e.preventDefault()} >
-                                                    <i className="icofont-user-alt-3"></i>
+                                                    <i className="fas fa-user"></i>
                                                 </a>
                                             </Dropdown>
                                         </div>}
@@ -262,24 +318,24 @@ const Header = observer(({menu, store}: Props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="header-small-device header-small-ptb sticky-bar">
+                    <div className="header-small-device header-small-ptb sticky-bar mb-10">
                         <div className="container-fluid">
                             <div className="row align-items-center">
                                 <div className="col-6">
                                     <div className="mobile-logo mobile-logo-width">
-                                        <a href="index.html">
-                                            <h2 style={{color: primary}}>{store.storeName}</h2>
+                                        <a href="javascript:;" onClick={() => navig.push('/')}>
+                                            <h3 style={{color: primary, fontFamily: 'Kumbh Sans', fontWeight: 700}}>{store.storeName}</h3>
                                         </a>
                                     </div>
                                 </div>
                                 <div className="col-6">
                                     <div className="header-action-wrap header-action-flex header-action-mrg-1">
                                         <div className="same-style header-cart">
-                                            <a className="cart-active" href="#"><i
+                                            <a href="javascript:;" onClick={() => TriggerCart()}><i
                                                 className="icofont-shopping-cart"></i></a>
                                         </div>
                                         <div className="same-style header-info">
-                                            <button className="mobile-menu-button-active">
+                                            <button onClick={() => TriggerMobileMenu()}>
                                                 <span className="info-width-1"></span>
                                                 <span className="info-width-2"></span>
                                                 <span className="info-width-3"></span>
@@ -293,53 +349,69 @@ const Header = observer(({menu, store}: Props) => {
                 </header>
             </div>
             <CardSideBar/>
-            <div className="mobile-menu-active clickalbe-sidebar-wrapper-style-1">
-                <div className="clickalbe-sidebar-wrap">
-                    <a className="sidebar-close"><i className="icofont-close-line"></i></a>
-                    <div className="mobile-menu-content-area sidebar-content-100-percent">
-                        <div className="mobile-search">
-                            <form className="search-form" action="#">
-                                <input type="text" placeholder="Search here…"/>
-                                <button className="button-search"><i className="icofont-search-1"></i></button>
-                            </form>
-                        </div>
-                        <div className="clickable-mainmenu-wrap clickable-mainmenu-style1">
-                            <nav>
-                                <ul>
-                                    {menuTree.map((item: any) => (
-                                        <li className="has-sub-menu"><a href="#">{item.title}</a>
-                                            <ul className="sub-menu-2">
-                                                {item.children !== undefined && item.children.length > 0
-                                                && item.children.map((child) => {
-                                                    return (
-                                                        <li className="has-sub-menu"><a href="#">{child.title}</a>
-                                                            <ul className="sub-menu-2">
-                                                                {child.children !== undefined && child.children.length > 0
-                                                                && child.children.map((lilMenu) => (
-                                                                    <li><a href="index.html">{lilMenu.title}</a></li>
-                                                                ))}
-                                                            </ul>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </nav>
-                        </div>
-                        <div className="aside-contact-info">
-                            <ul>
-                                <li><i className="icofont-clock-time"></i>Monday - Friday: 9:00 - 19:00</li>
-                                <li><i className="icofont-envelope"></i>Info@example.com</li>
-                                <li><i className="icofont-stock-mobile"></i>(+55) 254. 254. 254</li>
-                                <li><i className="icofont-home"></i>Helios Tower 75 Tam Trinh Hoang - Ha Noi - Viet Nam
-                                </li>
-                            </ul>
+            <Drawer open={mobileMenu} onClose={() => TriggerMobileMenu()}>
+                <div className="mobile-menu-active clickalbe-sidebar-wrapper-style-1 sidebar-visible">
+                    <div className="clickalbe-sidebar-wrap">
+                        <a className="sidebar-close" onClick={() => TriggerMobileMenu()}><i className="icofont-close-line"></i></a>
+                        <div className="mobile-menu-content-area sidebar-content-100-percent">
+                            <div className="mobile-search">
+                                <form className="search-form" action="#">
+                                    <input type="text" placeholder="Search here…"/>
+                                    <button className="button-search"><i className="icofont-search-1"></i></button>
+                                </form>
+                            </div>
+                            <div className="clickable-mainmenu-wrap clickable-mainmenu-style1">
+                                <nav>
+                                    <ul>
+                                        {menuTree.map((item: any) => (
+                                            <li className={clsx({'has-sub-menu': (item.children !== undefined && item.children.length > 0)})}><a href="javascript:;" onClick={() => ClickMenuItem(item)}>{item.title}</a>
+                                                {item.children !== undefined && item.children.length > 0 &&
+                                                <ul className="sub-menu-2">
+                                                    {item.children.map((child) => {
+                                                        return (
+                                                            <li className={clsx({'has-sub-menu': (child.children !== undefined && child.children.length > 0)})}>
+                                                                <a href="javascript:;" onClick={() => ClickMenuItem(item)}>{child.title}</a>
+                                                                {child.children !== undefined && child.children.length > 0 && <ul className="sub-menu-2">
+                                                                    {child.children.map((lilMenu) => (
+                                                                        <li><a href="javascript:;" onClick={() => ClickFacetItem(lilMenu, child)}>{lilMenu.title}</a></li>
+                                                                    ))}
+                                                                </ul>}
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
+                                                }
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </nav>
+                            </div>
+                            <Divider/>
+                            <div className="aside-contact-info">
+                                {!user && <ul>
+                                    <li><a href="javascript:;" onClick={() => {
+                                        setLogin(true)
+                                        TriggerMobileMenu()
+                                    }}>Log in</a></li>
+                                    <li><a href="javascript:;" onClick={() => {
+                                        setRegister(true)
+                                        TriggerMobileMenu()
+                                    }}>Create Account</a></li>
+                                </ul>}
+                                {user && <ul>
+                                    <li onClick={() => navig.push('/accounts?q=orders')}>Order</li>
+                                    <li onClick={() => navig.push('/accounts?q=profile')}>My Profile</li>
+                                    <li onClick={() => navig.push('/accounts?q=address')}>My Addresses</li>
+                                    <li onClick={() => {
+                                        setStoreLogout()
+                                        Cookies.remove(GridIronConstants)
+                                    }} style={{color: danger}}>Logout</li>
+                                </ul>}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Drawer>
             <Modal visible={login} footer={null} title={<h6 style={{color: primary, marginBottom: -10}}>Login</h6>} closable={false} onCancel={() => setLogin(false)}>
                 <div className='container'>
                     <div style={{marginTop: 10, marginBottom: 10}}>

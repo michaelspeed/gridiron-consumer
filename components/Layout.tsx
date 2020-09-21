@@ -36,7 +36,7 @@ const Layout = ({children, menu, title = 'AirEcommerce', store}: Props) => {
                 <Header menu={menu} store={store}/>
                 {children}
             </div>
-            <Footer/>
+            <Footer store={store}/>
             <Drawer open={quickview} anchor={"bottom"} onClose={() => {
                 setQuickView()
                 setQuickViewNull()

@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout";
 import withApollo from "../../utils/withApollo";
 import {
-    Collection,
+    Collection, CreateViewDocument,
     FacetValue,
     GetDefaultStoreDocument,
     GetMenuDocument, GetProductVariantByProductDocument,
@@ -15,6 +15,8 @@ import {assetsURL} from "../../utils/globalconstants";
 import {primary} from "../../utils/colorConfig";
 import {useRouter} from "next/router";
 import {observer} from "mobx-react";
+import {useEffect, useState} from "react";
+import {useMutation} from "@apollo/client";
 
 interface Props {
     id: string,
@@ -24,9 +26,20 @@ interface Props {
     prod: Product
 }
 
-const VariantSingle = ({menu, store, variant, prod}: Props) => {
+const VariantSingle = ({menu, store, variant, prod, id}: Props) => {
 
     const {setQuickView, setQuickViewType} = useStore()
+
+    const [CreateView] = useMutation(CreateViewDocument)
+
+    const [view, setView] = useState(false)
+
+    useEffect(() => {
+        if(!view) {
+            CreateView({variables:{id: id, variant: 'PRODUCT'}})
+            setView(true)
+        }
+    })
 
     const navig = useRouter()
 
@@ -39,7 +52,7 @@ const VariantSingle = ({menu, store, variant, prod}: Props) => {
     }
 
     return (
-        <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
+        <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
             <div className="breadcrumb-area breadcrumb-mt bg-gray breadcrumb-ptb-1" style={{marginTop: 130}}>
                 <div className="container">
                     <div className="breadcrumb-content text-center">

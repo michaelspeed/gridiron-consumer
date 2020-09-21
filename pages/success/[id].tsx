@@ -17,7 +17,7 @@ interface Props {
 const Success = ({menu, store, order}: Props) => {
     return (
         <React.Fragment>
-            <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
+            <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
                 <div className="breadcrumb-area breadcrumb-mt bg-gray breadcrumb-ptb-1" style={{marginTop: 130}}>
                     <div className="container">
                         <div className="breadcrumb-content text-center">

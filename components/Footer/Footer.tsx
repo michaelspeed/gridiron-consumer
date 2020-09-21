@@ -1,7 +1,12 @@
-export default function Footer() {
+import {useStore} from "../../store/store";
+
+export default function Footer({store}) {
+
+    const {} = useStore()
+
     return (
         <footer className="footer-area">
-            <div className="footer-top pb-120">
+            {/*<div className="footer-top pb-120">
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-3 col-md-6 col-sm-6">
@@ -87,7 +92,7 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>*/}
             <div className="footer-bottom border-top-2 copyright-ptb-2">
                 <div className="container">
                     <div className="row align-items-center">
@@ -104,8 +109,8 @@ export default function Footer() {
                         </div>
                         <div className="col-xl-4 col-lg-6 col-md-12">
                             <div className="copyright-2 text-center">
-                                <p>Copyright © 2020 Dking - <a target="_blank" href="https://hasthemes.com/"> All Right
-                                    Reserved</a></p>
+                                <p>Copyright © 2020 {store.storeName}- All Right
+                                    Reserved</p>
                             </div>
                         </div>
                         <div className="col-xl-4 col-lg-3 col-md-12">

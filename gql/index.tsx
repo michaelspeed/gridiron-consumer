@@ -3358,6 +3358,7 @@ export type Query = {
   GetUserAddress: Array<Address>;
   GetAllSearch: Array<Search>;
   queryFacet: Array<Product>;
+  GetFacetDocument: FacetValue;
   GetCart: Cart;
   getPaymentCodes: PaymentMethod;
   getMyOrders: Array<Order>;
@@ -3421,6 +3422,11 @@ export type QueryQueryFacetArgs = {
 };
 
 
+export type QueryGetFacetDocumentArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryGetCartArgs = {
   id: Scalars['ID'];
 };
@@ -3434,6 +3440,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   ShiftProductVariant: ProductVariant;
   creteReview: Review;
+  createView: View;
   CreateUser: UserResponse;
   LoginUser: UserResponse;
   UpdateAccountInfo: User;
@@ -3456,6 +3463,12 @@ export type MutationCreteReviewArgs = {
   stars: Scalars['Float'];
   varId: Scalars['String'];
   text: Scalars['String'];
+};
+
+
+export type MutationCreateViewArgs = {
+  variant: Scalars['String'];
+  id: Scalars['String'];
 };
 
 
@@ -3684,6 +3697,20 @@ export type CreateReviewMutation = (
   ) }
 );
 
+export type CreateViewMutationVariables = Exact<{
+  id: Scalars['String'];
+  variant: Scalars['String'];
+}>;
+
+
+export type CreateViewMutation = (
+  { __typename?: 'Mutation' }
+  & { createView: (
+    { __typename?: 'View' }
+    & Pick<View, 'id'>
+  ) }
+);
+
 export type GetMenuQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3889,7 +3916,10 @@ export type GetProductVariantForCollectionQuery = (
   & { GetProductVariantForCollection: Array<(
     { __typename?: 'ProductVariant' }
     & Pick<ProductVariant, 'id' | 'name' | 'rating'>
-    & { asset: (
+    & { price?: Maybe<Array<(
+      { __typename?: 'ProductVariantPrice' }
+      & Pick<ProductVariantPrice, 'id' | 'price'>
+    )>>, asset: (
       { __typename?: 'ProductVariantAsset' }
       & Pick<ProductVariantAsset, 'id'>
       & { asset: (
@@ -4128,6 +4158,23 @@ export type GetSingleOrderQuery = (
         ) }
       ) }
     )> }
+  ) }
+);
+
+export type GetFacetDocumentQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetFacetDocumentQuery = (
+  { __typename?: 'Query' }
+  & { GetFacetDocument: (
+    { __typename?: 'FacetValue' }
+    & Pick<FacetValue, 'id' | 'code'>
+    & { facet: (
+      { __typename?: 'Facet' }
+      & Pick<Facet, 'id' | 'name' | 'code'>
+    ) }
   ) }
 );
 
@@ -4462,6 +4509,39 @@ export function useCreateReviewMutation(baseOptions?: Apollo.MutationHookOptions
 export type CreateReviewMutationHookResult = ReturnType<typeof useCreateReviewMutation>;
 export type CreateReviewMutationResult = Apollo.MutationResult<CreateReviewMutation>;
 export type CreateReviewMutationOptions = Apollo.BaseMutationOptions<CreateReviewMutation, CreateReviewMutationVariables>;
+export const CreateViewDocument = gql`
+    mutation createView($id: String!, $variant: String!) {
+  createView(id: $id, variant: $variant) {
+    id
+  }
+}
+    `;
+export type CreateViewMutationFn = Apollo.MutationFunction<CreateViewMutation, CreateViewMutationVariables>;
+
+/**
+ * __useCreateViewMutation__
+ *
+ * To run a mutation, you first call `useCreateViewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateViewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createViewMutation, { data, loading, error }] = useCreateViewMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      variant: // value for 'variant'
+ *   },
+ * });
+ */
+export function useCreateViewMutation(baseOptions?: Apollo.MutationHookOptions<CreateViewMutation, CreateViewMutationVariables>) {
+        return Apollo.useMutation<CreateViewMutation, CreateViewMutationVariables>(CreateViewDocument, baseOptions);
+      }
+export type CreateViewMutationHookResult = ReturnType<typeof useCreateViewMutation>;
+export type CreateViewMutationResult = Apollo.MutationResult<CreateViewMutation>;
+export type CreateViewMutationOptions = Apollo.BaseMutationOptions<CreateViewMutation, CreateViewMutationVariables>;
 export const GetMenuDocument = gql`
     query GetMenu {
   GetMenu {
@@ -4886,6 +4966,10 @@ export const GetProductVariantForCollectionDocument = gql`
     id
     name
     rating
+    price {
+      id
+      price
+    }
     asset {
       id
       asset {
@@ -5408,3 +5492,42 @@ export function useGetSingleOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetSingleOrderQueryHookResult = ReturnType<typeof useGetSingleOrderQuery>;
 export type GetSingleOrderLazyQueryHookResult = ReturnType<typeof useGetSingleOrderLazyQuery>;
 export type GetSingleOrderQueryResult = Apollo.QueryResult<GetSingleOrderQuery, GetSingleOrderQueryVariables>;
+export const GetFacetDocumentDocument = gql`
+    query GetFacetDocument($id: ID!) {
+  GetFacetDocument(id: $id) {
+    id
+    code
+    facet {
+      id
+      name
+      code
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFacetDocumentQuery__
+ *
+ * To run a query within a React component, call `useGetFacetDocumentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFacetDocumentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFacetDocumentQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetFacetDocumentQuery(baseOptions?: Apollo.QueryHookOptions<GetFacetDocumentQuery, GetFacetDocumentQueryVariables>) {
+        return Apollo.useQuery<GetFacetDocumentQuery, GetFacetDocumentQueryVariables>(GetFacetDocumentDocument, baseOptions);
+      }
+export function useGetFacetDocumentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFacetDocumentQuery, GetFacetDocumentQueryVariables>) {
+          return Apollo.useLazyQuery<GetFacetDocumentQuery, GetFacetDocumentQueryVariables>(GetFacetDocumentDocument, baseOptions);
+        }
+export type GetFacetDocumentQueryHookResult = ReturnType<typeof useGetFacetDocumentQuery>;
+export type GetFacetDocumentLazyQueryHookResult = ReturnType<typeof useGetFacetDocumentLazyQuery>;
+export type GetFacetDocumentQueryResult = Apollo.QueryResult<GetFacetDocumentQuery, GetFacetDocumentQueryVariables>;

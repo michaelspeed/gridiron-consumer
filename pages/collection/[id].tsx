@@ -1,6 +1,6 @@
 import Layout from "../../components/Layout";
 import {
-    Collection, FacetValue,
+    Collection, CreateViewDocument, FacetValue,
     GetDefaultStoreDocument, GetFacetsByCollectionDocument,
     GetMenuDocument, GetProductVariantForCollectionDocument, GetSingleCollectionDocument,
     GetSingleProductVariantDocument,
@@ -8,7 +8,7 @@ import {
     Store
 } from "../../gql";
 import withApollo from "../../utils/withApollo";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {useEffect, useState} from "react";
 import {Checkbox, Spin} from 'antd';
 import {assetsURL} from "../../utils/globalconstants";
@@ -17,7 +17,7 @@ import {primary} from "../../utils/colorConfig";
 import {initializeStore} from "../../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import {useRouter} from "next/router";
-import {getProdRoute} from "../../utils/routingUtils";
+import {getCollectionRoute, getProdRoute} from "../../utils/routingUtils";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -35,6 +35,17 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
     const [page, setPage] = useState(1)
     const [products, setProducts] = useState<ProductVariant[]>([])
     const [search, setSearch] = useState('')
+
+    const [CreateView] = useMutation(CreateViewDocument)
+
+    const [view, setView] = useState(false)
+
+    useEffect(() => {
+        if(!view) {
+            CreateView({variables:{id: id, variant: 'COLLECTION'}})
+            setView(true)
+        }
+    })
 
     const navig = useRouter()
 
@@ -73,8 +84,16 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
         }
     }, [facetCol.data])
 
+    const getPrice = (variant: ProductVariant) => {
+        let price = 0
+        if (variant.price !== null && variant.price!.length !== 0) {
+            price = variant.price![0].price
+        }
+        return price
+    }
+
     return (
-        <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
+        <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
             <div style={{marginBottom: 155}}/>
             <div className="breadcrumb-area breadcrumb-mt bg-gray breadcrumb-ptb-1">
                 <div className="container">
@@ -93,12 +112,12 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                         {collection.children.map(subCol => (
                             <div className="single-categories-5 text-center" style={{width: '100%'}}>
                                 <div className="single-categories-5-img">
-                                    <a href="shop.html"><img className="inject-me"
-                                                             src="assets/images/icon-img/furniture-dress.svg"
+                                    <a href="#"><img className="inject-me"
+                                                             src="/assets/images/icon-img/furniture-dress.svg"
                                                              alt=""/></a>
                                 </div>
                                 <div className="categorie-content-6">
-                                    <h5><a style={{color: '#212529', fontFamily:'Poppins'}} href="shop.html">{subCol.name}</a></h5>
+                                    <h5><a style={{color: '#212529', fontFamily:'Poppins'}} href="javascript:;" onClick={() => navig.push(getCollectionRoute(subCol.id))}>{subCol.name}</a></h5>
                                 </div>
                             </div>
                         ))}
@@ -136,21 +155,21 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                                         <div className="product-content">
                                                             <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                                             <div className="product-price">
-                                                                <span>$ 124</span>
-                                                                <span className="old-price">$ 130</span>
+                                                                <span>{getPrice(variant) === 0 ? 'Unavailable' : `₹ ${getPrice(variant)}`}</span>
+                                                                {/*<span className="old-price">$ 130</span>*/}
                                                             </div>
                                                         </div>
                                                         <div className="product-action-position-1 text-center">
                                                             <div className="product-content">
                                                                 <h4><a href="javascript:;" onClick={() => navig.push(getProdRoute(variant.id))}>{variant.name}</a></h4>
                                                                 <div className="product-price">
-                                                                    <span>$ 124</span>
-                                                                    <span className="old-price">$ 130</span>
+                                                                    <span>{getPrice(variant) === 0 ? 'Unavailable' : `₹ ${getPrice(variant)}`}</span>
+                                                                    {/*<span className="old-price">$ 130</span>*/}
                                                                 </div>
                                                             </div>
                                                             <div className="product-action-wrap">
                                                                 <div className="product-action-cart">
-                                                                    <button title="Quick View" style={{backgroundColor: primary}}>Quick view</button>
+                                                                    <button title="Quick View" style={{backgroundColor: primary}} onClick={() => navig.push(getProdRoute(variant.id))}>Quick view</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -161,7 +180,7 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                     </div>
                                     <div className="pro-pagination-style text-center mt-50">
                                         {loading && <Spin indicator={antIcon} />}
-                                        {!loading && !error && <button
+                                        {!loading && !error && products.length > 0 && <button
                                             style={{backgroundColor: primary, padding: '7px 32px 7px', color: '#FFFFFF', border: "none", fontWeight: 500, fontSize: 12}}
                                             onClick={() => setPage(page + 1)}
                                         >Load More</button>}
@@ -176,7 +195,7 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                     <div className="sidebar-widget-categori mt-45 mb-70">
                                         <ul>
                                             {collection.children.map(sub => (
-                                                <li><a href="#">{sub.name}</a></li>
+                                                <li><a href="javascript:;" onClick={() => navig.push(getCollectionRoute(sub.id))}>{sub.name}</a></li>
                                             ))}
                                         </ul>
                                     </div>
@@ -193,7 +212,7 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                         </div>
                                     </div>
                                 ))}
-                                <div className="sidebar-widget">
+                                {/*<div className="sidebar-widget">
                                     <h4 className="pro-sidebar-title">Filter By Price Range</h4>
                                     <div className="price-filter mt-55 mb-65">
                                         <div id="slider-range"></div>
@@ -204,7 +223,7 @@ const CollectionSingle = ({menu, store, collection, id}: Props) => {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>*/}
                             </div>
                         </div>
                     </div>

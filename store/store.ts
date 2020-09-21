@@ -49,7 +49,9 @@ const Store = types
         token: types.maybeNull(types.string),
         quickview: types.boolean,
         qtype: types.maybeNull(IQType),
-        cart: types.array(ICartItem)
+        cart: types.array(ICartItem),
+        cartOpen: types.boolean,
+        mobileMenu: types.boolean
     }).actions(self => {
         const loadCart = () => {
             const cart = localStorage.getItem(CartSSD)
@@ -100,6 +102,12 @@ const Store = types
         const ResetCart = () => {
             self.cart.splice(0, self.cart.length)
         }
+        const TriggerCart = () => {
+            self.cartOpen = !self.cartOpen
+        }
+        const TriggerMobileMenu = () => {
+            self.mobileMenu = !self.mobileMenu
+        }
         return {
             setStoreLogin,
             setQuickView,
@@ -111,7 +119,9 @@ const Store = types
             loadCart,
             AddQuantity,
             RemoveQuantity,
-            ResetCart
+            ResetCart,
+            TriggerCart,
+            TriggerMobileMenu
         }
     })
 
@@ -120,7 +130,7 @@ export type IStoreSnapshotIn = SnapshotIn<typeof Store>
 export type IStoreSnapshotOut = SnapshotOut<typeof Store>
 
 export function initializeStore(snapshot = null) {
-    const _store = store ?? Store.create({user: null, token: null, quickview: false})
+    const _store = store ?? Store.create({user: null, token: null, quickview: false, cartOpen: false, mobileMenu: false})
 
     if (snapshot) {
         applySnapshot(_store, snapshot)

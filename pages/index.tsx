@@ -10,7 +10,7 @@ import {initializeStore} from "../store/store";
 import {getSnapshot} from "mobx-state-tree";
 import React from "react";
 import Slider from "react-slick";
-import {getProdRoute} from "../utils/routingUtils";
+import {getProdRoute, getVariantRoute} from "../utils/routingUtils";
 
 interface Props {
   menu: any,
@@ -27,6 +27,8 @@ const IndexPage = ({menu, main, list, store}: Props) => {
   const onClickCarousel = (item) => {
     if (item.type === 'variant') {
       navig.push(getProdRoute(item.target.id))
+    } else if (item.type === 'product') {
+      navig.push(getVariantRoute(item.target.id))
     }
   }
 
@@ -66,7 +68,7 @@ const IndexPage = ({menu, main, list, store}: Props) => {
   };
 
   return (
-      <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
+      <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
         <div className="slider-area bg-light-green slider-mt-1">
           <div className="slider-active-1 nav-style-1 dot-style-1">
             {main.map(item => (

@@ -1,6 +1,6 @@
 import Layout from "../../components/Layout";
 import {
-    Asset,
+    Asset, CreateViewDocument,
     GetDefaultStoreDocument,
     GetHomePageDocument,
     GetMenuDocument,
@@ -29,7 +29,8 @@ interface Props {
     menu: any,
     variant: ProductVariant,
     store: Store
-    price: ProductVariantPrice[]
+    price: ProductVariantPrice[],
+    id: string
 }
 
 const customIcons = {
@@ -40,12 +41,23 @@ const customIcons = {
     5: <SmileOutlined />,
 };
 
-const SingleProduct = ({menu, variant, store, price}: Props) => {
+const SingleProduct = ({menu, variant, store, price, id}: Props) => {
 
     const [allAssets, setAllAllAssets] = useState<Asset[]>([])
     const [booking, setBooking] = useState(false)
     const [check, setCheck] = useState(false)
     const [pincode, setPincode] = useState('')
+
+    const [CreateView] = useMutation(CreateViewDocument)
+
+    const [view, setView] = useState(false)
+
+    useEffect(() => {
+        if(!view) {
+            CreateView({variables:{id: id, variant: 'VARIANT'}})
+            setView(true)
+        }
+    })
 
     const navig = useRouter()
 
@@ -95,7 +107,7 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
     }
 
     return (
-        <Layout title="AirEcommerce" menu={menu.data.GetMenu.menu} store={store}>
+        <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
             <div className="product-details-area product-details-bg slider-mt-7" style={{marginTop: 120}}>
                 <div className="container">
                     <div className="row">
@@ -241,6 +253,9 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                                 <div id="des-details3" className="tab-pane">
                                     <div className="review-wrapper">
                                         <h2>Reviews for {variant.name}</h2>
+                                        {variant.reviews.length === 0 && <div className='d-flex justify-content-center align-items-center'>
+                                            <span>No Reviews</span>
+                                        </div>}
                                         {variant.reviews.map(rev => (
                                             <div className="single-review">
                                                 <div className="review-content">
@@ -265,185 +280,6 @@ const SingleProduct = ({menu, variant, store, price}: Props) => {
                     </div>
                 </div>
             </div>
-            {/*<div className="product-area pb-155">
-                <div className="container">
-                    <div className="section-title-8 mb-65">
-                        <h2>You May Like Also</h2>
-                    </div>
-                    <div className="product-slider-active-4">
-                        <div className="product-wrap-plr-1">
-                            <div className="product-wrap">
-                                <div className="product-img product-img-zoom mb-25">
-                                    <a href="product-details.html">
-                                        <img src="assets/images/product/product-151.jpg" alt=""/>
-                                    </a>
-                                </div>
-                                <div className="product-content">
-                                    <h4><a href="product-details.html">Product Title</a></h4>
-                                    <div className="product-price">
-                                        <span>$ 124</span>
-                                        <span className="old-price">$ 130</span>
-                                    </div>
-                                </div>
-                                <div className="product-action-position-1 text-center">
-                                    <div className="product-content">
-                                        <h4><a href="product-details.html">Product Title</a></h4>
-                                        <div className="product-price">
-                                            <span>$ 124</span>
-                                            <span className="old-price">$ 130</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-action-wrap">
-                                        <div className="product-action-cart">
-                                            <button title="Add to Cart">Add to cart</button>
-                                        </div>
-                                        <button data-toggle="modal" data-target="#exampleModal"><i
-                                            className="icon-zoom"></i></button>
-                                        <button title="Add to Compare"><i className="icon-compare"></i></button>
-                                        <button title="Add to Wishlist"><i className="icon-heart-empty"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product-wrap-plr-1">
-                            <div className="product-wrap">
-                                <div className="product-img product-img-zoom mb-25">
-                                    <a href="product-details.html">
-                                        <img src="assets/images/product/product-152.jpg" alt=""/>
-                                    </a>
-                                </div>
-                                <div className="product-content">
-                                    <h4><a href="product-details.html">Product Title</a></h4>
-                                    <div className="product-price">
-                                        <span>$ 124</span>
-                                        <span className="old-price">$ 130</span>
-                                    </div>
-                                </div>
-                                <div className="product-action-position-1 text-center">
-                                    <div className="product-content">
-                                        <h4><a href="product-details.html">Product Title</a></h4>
-                                        <div className="product-price">
-                                            <span>$ 124</span>
-                                            <span className="old-price">$ 130</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-action-wrap">
-                                        <div className="product-action-cart">
-                                            <button title="Add to Cart">Add to cart</button>
-                                        </div>
-                                        <button data-toggle="modal" data-target="#exampleModal"><i
-                                            className="icon-zoom"></i></button>
-                                        <button title="Add to Compare"><i className="icon-compare"></i></button>
-                                        <button title="Add to Wishlist"><i className="icon-heart-empty"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product-wrap-plr-1">
-                            <div className="product-wrap">
-                                <div className="product-img product-img-zoom mb-25">
-                                    <a href="product-details.html">
-                                        <img src="assets/images/product/product-153.jpg" alt=""/>
-                                    </a>
-                                </div>
-                                <div className="product-content">
-                                    <h4><a href="product-details.html">Product Title</a></h4>
-                                    <div className="product-price">
-                                        <span>$ 124</span>
-                                        <span className="old-price">$ 130</span>
-                                    </div>
-                                </div>
-                                <div className="product-action-position-1 text-center">
-                                    <div className="product-content">
-                                        <h4><a href="product-details.html">Product Title</a></h4>
-                                        <div className="product-price">
-                                            <span>$ 124</span>
-                                            <span className="old-price">$ 130</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-action-wrap">
-                                        <div className="product-action-cart">
-                                            <button title="Add to Cart">Add to cart</button>
-                                        </div>
-                                        <button data-toggle="modal" data-target="#exampleModal"><i
-                                            className="icon-zoom"></i></button>
-                                        <button title="Add to Compare"><i className="icon-compare"></i></button>
-                                        <button title="Add to Wishlist"><i className="icon-heart-empty"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product-wrap-plr-1">
-                            <div className="product-wrap">
-                                <div className="product-img product-img-zoom mb-25">
-                                    <a href="product-details.html">
-                                        <img src="assets/images/product/product-154.jpg" alt=""/>
-                                    </a>
-                                </div>
-                                <div className="product-content">
-                                    <h4><a href="product-details.html">Product Title</a></h4>
-                                    <div className="product-price">
-                                        <span>$ 124</span>
-                                        <span className="old-price">$ 130</span>
-                                    </div>
-                                </div>
-                                <div className="product-action-position-1 text-center">
-                                    <div className="product-content">
-                                        <h4><a href="product-details.html">Product Title</a></h4>
-                                        <div className="product-price">
-                                            <span>$ 124</span>
-                                            <span className="old-price">$ 130</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-action-wrap">
-                                        <div className="product-action-cart">
-                                            <button title="Add to Cart">Add to cart</button>
-                                        </div>
-                                        <button data-toggle="modal" data-target="#exampleModal"><i
-                                            className="icon-zoom"></i></button>
-                                        <button title="Add to Compare"><i className="icon-compare"></i></button>
-                                        <button title="Add to Wishlist"><i className="icon-heart-empty"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product-wrap-plr-1">
-                            <div className="product-wrap">
-                                <div className="product-img product-img-zoom mb-25">
-                                    <a href="product-details.html">
-                                        <img src="assets/images/product/product-152.jpg" alt=""/>
-                                    </a>
-                                </div>
-                                <div className="product-content">
-                                    <h4><a href="product-details.html">Product Title</a></h4>
-                                    <div className="product-price">
-                                        <span>$ 124</span>
-                                        <span className="old-price">$ 130</span>
-                                    </div>
-                                </div>
-                                <div className="product-action-position-1 text-center">
-                                    <div className="product-content">
-                                        <h4><a href="product-details.html">Product Title</a></h4>
-                                        <div className="product-price">
-                                            <span>$ 124</span>
-                                            <span className="old-price">$ 130</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-action-wrap">
-                                        <div className="product-action-cart">
-                                            <button title="Add to Cart">Add to cart</button>
-                                        </div>
-                                        <button data-toggle="modal" data-target="#exampleModal"><i
-                                            className="icon-zoom"></i></button>
-                                        <button title="Add to Compare"><i className="icon-compare"></i></button>
-                                        <button title="Add to Wishlist"><i className="icon-heart-empty"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>*/}
             <Drawer open={booking} onClose={() => setBooking(false)} anchor={"bottom"}>
                 <div className='row'>
                     {price.map(item => (
@@ -488,7 +324,8 @@ SingleProduct.getInitialProps = async (ctx) => {
         variant: variant.data.getSingleProductVariant,
         store: defaultStore.data.GetDefaultStore,
         initialStore: getSnapshot(store),
-        price: variantPrice.data.singProductPrice.price
+        price: variantPrice.data.singProductPrice.price,
+        id
     }
 }
 

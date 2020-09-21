@@ -82,7 +82,7 @@ const Checkout = ({menu, store}: Props) => {
     }, [pageState, paymentMode])
 
     return (
-        <Layout title={'AirEcommerce Checkout'} menu={menu.data.GetMenu.menu} store={store}>
+        <Layout title={store.storeName} menu={menu.data.GetMenu.menu} store={store}>
             <div className="shop-area pt-160 pb-160">
                 <div className="container">
                     <div className="row flex-row-reverse">
